@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="teamget.autoschedule">
 
     <application
@@ -9,13 +10,22 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ChosenTimetable"></activity>
-        <activity android:name=".Top5Timetables" />
+        <activity
+            android:name=".ChosenTimetable"
+            android:label="ChosenTimetable"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".Top5Timetables"
+            android:label="Top5Timetables"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".PriorityInput"
             android:label="@string/title_activity_priority_input"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".ModuleInput" />
+        <activity
+            android:name=".ModuleInput"
+            android:label="ModuleInput"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

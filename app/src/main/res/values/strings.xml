@@ -1,4 +1,17 @@
 <resources>
     <string name="app_name">AutoSchedule</string>
     <string name="title_activity_priority_input">PriorityInput</string>
+
+    <string name="main.msg.welcome">Welcome to AutoSchedule!</string>
+
+    <string name="moduleinput.toolbar.title">Add your modules</string>
+    <string name="moduleinput.toolbar.done">Done</string>
+    <string name="moduleinput.hint.search">Search for module...</string>
+
+    <string name="priorityinput.toolbar.title">Enter your priorities</string>
+    <string name="priorityinput.toolbar.done">Done</string>
+
+    <string name="top5timetables.toolbar.title">Choose your timetable</string>
+
+    <string name="chosentimetable.toolbar.title">Your timetable</string>
 </resources>
