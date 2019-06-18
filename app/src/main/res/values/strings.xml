@@ -3,6 +3,7 @@
     <string name="title_activity_priority_input">PriorityInput</string>
 
     <string name="main.msg.welcome">Welcome to AutoSchedule!</string>
+    <string name="main.button.start">Let\'s Get Started</string>
 
     <string name="moduleinput.toolbar.title">Add your modules</string>
     <string name="moduleinput.toolbar.done">Done</string>

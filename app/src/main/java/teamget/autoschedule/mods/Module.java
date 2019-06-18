@@ -10,4 +10,9 @@ public class Module {
         code = c;
         list = l;
     }
+
+    @Override
+    public String toString() {
+        return code;
+    }
 }

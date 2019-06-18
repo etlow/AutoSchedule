@@ -1,13 +1,29 @@
 package teamget.autoschedule;
 
+import teamget.autoschedule.mods.*;
+
 import android.content.Intent;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.SearchView;
 
-public class ModuleInput extends AppCompatActivity {
+import java.util.ArrayList;
+
+public class ModuleInput extends AppCompatActivity implements SearchView.OnQueryTextListener {
+
+    ListView listView;
+    SearchView searchView;
+    ArrayAdapter<Module> adapter;
+    ArrayList<Module> moduleList = new ArrayList<Module>();
+    ArrayList<Module> selectedModules = new ArrayList<Module>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -15,6 +31,24 @@ public class ModuleInput extends AppCompatActivity {
         setContentView(R.layout.activity_module_input);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        searchView = (SearchView) findViewById(R.id.module_searchview);
+        listView = (ListView) findViewById(R.id.module_listview);
+        for (Module m : SampleModules.getModules()) { moduleList.add(m); }
+        adapter = new ArrayAdapter<Module>(this, android.R.layout.simple_list_item_1, moduleList);
+        listView.setAdapter(adapter);
+        searchView.setOnQueryTextListener(this);
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                selectedModules.add((Module) parent.getItemAtPosition(position));
+                // To-do: Stick selected modules to the top of list with "Added" tag
+                Snackbar.make(findViewById(android.R.id.content),
+                        parent.getItemAtPosition(position).toString() + " added!",
+                        Snackbar.LENGTH_LONG).show();
+            }
+        });
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -26,7 +60,6 @@ public class ModuleInput extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_done:
-                // Move to PriorityInput activity
                 Intent intent = new Intent(this, PriorityInput.class);
                 startActivity(intent);
                 return true;
@@ -35,5 +68,23 @@ public class ModuleInput extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
 
         }
+    }
+
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+        if (moduleList.contains(query)){
+            adapter.getFilter().filter(query);
+        } else {
+            Snackbar.make(findViewById(android.R.id.content),
+                    "No match found", Snackbar.LENGTH_LONG).show();
+        }
+        return false;
+    }
+
+
+    @Override
+    public boolean onQueryTextChange(String newText) {
+        adapter.getFilter().filter(newText);
+        return false;
     }
 }

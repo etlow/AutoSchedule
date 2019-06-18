@@ -24,8 +24,13 @@ public class SampleModules {
 
         List<Option> tut = Arrays.asList(ot1, ot2);
 
-        Module testMod = new Module("ABC1231", Arrays.asList(lec, tut));
+        Module testMod1 = new Module("ABC1231", Arrays.asList(lec, tut));
+        Module testMod2 = new Module("DEF1010", Arrays.asList(lec, tut));
+        Module testMod3 = new Module("GHI2030", Arrays.asList(lec, tut));
+        Module testMod4 = new Module("JKL2040", Arrays.asList(lec, tut));
+        Module testMod5 = new Module("MNO2100", Arrays.asList(lec, tut));
+        Module testMod6 = new Module("PQR3230", Arrays.asList(lec, tut));
 
-        return Arrays.asList(testMod);
+        return Arrays.asList(testMod1, testMod2, testMod3, testMod4, testMod5, testMod6);
     }
 }
