@@ -3,6 +3,7 @@ package teamget.autoschedule;
 import teamget.autoschedule.mods.*;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -23,7 +24,9 @@ public class ModuleInput extends AppCompatActivity implements SearchView.OnQuery
     SearchView searchView;
     ArrayAdapter<Module> adapter;
     ArrayList<Module> moduleList = new ArrayList<Module>();
-    ArrayList<Module> selectedModules = new ArrayList<Module>();
+    SharedPreferences moduleSP;
+    SharedPreferences.Editor spEditor;
+    int keyCounter = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,10 +42,17 @@ public class ModuleInput extends AppCompatActivity implements SearchView.OnQuery
         listView.setAdapter(adapter);
         searchView.setOnQueryTextListener(this);
 
+        moduleSP = getApplicationContext().getSharedPreferences("ModulePreferences", MODE_PRIVATE);
+        spEditor = moduleSP.edit();
+
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                selectedModules.add((Module) parent.getItemAtPosition(position));
+                Module selectedModule = (Module) parent.getItemAtPosition(position);
+                spEditor.putString("module" + keyCounter, selectedModule.toString());
+                spEditor.commit();
+                keyCounter++;
+
                 // To-do: Stick selected modules to the top of list with "Added" tag
                 Snackbar.make(findViewById(android.R.id.content),
                         parent.getItemAtPosition(position).toString() + " added!",
