@@ -1,10 +1,10 @@
 package teamget.autoschedule.mods;
 
 public class Lesson {
-    int start;
-    int end;
-    String type;
-    Location location;
+    public int start;
+    public int end;
+    public String type;
+    public Location location;
 
     public Lesson(int s, int e, String t, Location l) {
         start = s;

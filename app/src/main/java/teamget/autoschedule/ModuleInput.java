@@ -60,6 +60,7 @@ public class ModuleInput extends AppCompatActivity implements SearchView.OnQuery
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_done:
+                teamget.autoschedule.schedule.Timetable.test(selectedModules);
                 Intent intent = new Intent(this, PriorityInput.class);
                 startActivity(intent);
                 return true;
