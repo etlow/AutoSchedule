@@ -8,6 +8,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -17,6 +18,8 @@ import android.widget.ListView;
 import android.widget.SearchView;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class ModuleInput extends AppCompatActivity implements SearchView.OnQueryTextListener {
 
@@ -24,7 +27,7 @@ public class ModuleInput extends AppCompatActivity implements SearchView.OnQuery
     SearchView searchView;
     ArrayAdapter<Module> adapter;
     ArrayList<Module> moduleList = new ArrayList<Module>();
-    SharedPreferences moduleSP;
+    SharedPreferences modulePref;
     SharedPreferences.Editor spEditor;
     int keyCounter = 1;
 
@@ -42,8 +45,8 @@ public class ModuleInput extends AppCompatActivity implements SearchView.OnQuery
         listView.setAdapter(adapter);
         searchView.setOnQueryTextListener(this);
 
-        moduleSP = getApplicationContext().getSharedPreferences("ModulePreferences", MODE_PRIVATE);
-        spEditor = moduleSP.edit();
+        modulePref = getApplicationContext().getSharedPreferences("ModulePreferences", MODE_PRIVATE);
+        spEditor = modulePref.edit();
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -70,7 +73,14 @@ public class ModuleInput extends AppCompatActivity implements SearchView.OnQuery
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_done:
+                // For testing
+                List<Module> selectedModules = new ArrayList<>();
+                Map<String, ?> allEntries = modulePref.getAll();
+                for (Map.Entry<String, ?> entry : allEntries.entrySet()) {
+                    selectedModules.add(SampleModules.getModuleByCode(entry.toString()));
+                }
                 teamget.autoschedule.schedule.Timetable.test(selectedModules);
+
                 Intent intent = new Intent(this, PriorityInput.class);
                 startActivity(intent);
                 return true;

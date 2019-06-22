@@ -38,4 +38,14 @@ public class SampleModules {
 
         return Arrays.asList(testMod1, testMod2, testMod3, testMod4, testMod5, testMod6);
     }
+
+    public static Module getModuleByCode(String code) {
+        Module selected = null;
+        for (Module module : getModules()) {
+            if (module.code.equals(code)) {
+                selected = module;
+            }
+        }
+        return selected;
+    }
 }
