@@ -83,9 +83,10 @@ public class Timetable {
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
         for (Lesson l : table) {
-            stringBuilder.append(l.start);
+            stringBuilder.append(l.startHour);
             stringBuilder.append("-");
-            stringBuilder.append(l.end);
+            stringBuilder.append(l.endHour);
+            stringBuilder.append(l.moduleCode);
             stringBuilder.append(l.type);
             stringBuilder.append(l.location);
             stringBuilder.append(" ");
