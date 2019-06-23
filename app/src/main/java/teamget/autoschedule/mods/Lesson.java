@@ -1,5 +1,7 @@
 package teamget.autoschedule.mods;
 
+import java.time.DayOfWeek;
+
 public class Lesson {
     public int day;
     public int startHour;
@@ -10,15 +12,19 @@ public class Lesson {
     public String type;
     public Location location;
 
-    public Lesson(int d, int s, int e, boolean oW, boolean eW, String m, String t, Location l) {
-        day = d;
-        startHour = s;
-        endHour = e;
+    public Lesson(String d, String s, String e, boolean oW, boolean eW, String m, String t, Location l) {
+        day = DayOfWeek.valueOf(d.toUpperCase()).ordinal() + 1;
+        startHour = parseHour(s);
+        endHour = parseHour(e);
         oddWeek = oW;
         evenWeek = eW;
         moduleCode = m;
         type = t;
         location = l;
+    }
+
+    private int parseHour(String time) {
+        return Integer.parseInt(time.substring(0, 2));
     }
 
     public boolean overlaps(Lesson other) {

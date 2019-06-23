@@ -1,42 +1,123 @@
 package teamget.autoschedule.mods;
 
+import android.util.Log;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import teamget.autoschedule.DownloadTask;
 
 public class SampleModules {
-    public static Module genModule(String moduleCode, int day) {
-        Location loc0 = new Location("UTown");
-        Location loc1 = new Location("FoS");
-        Location loc2 = new Location("SoC");
-
-        Lesson a = new Lesson(day, 1, 2, true, true, moduleCode, "Lecture", loc0);
-        Lesson b = new Lesson(day, 11, 12, true, true, moduleCode, "Lecture", loc0);
-        Option o1 = new Option(Arrays.asList(a, b));
-
-        Lesson c = new Lesson(day, 2, 3, true, true, moduleCode, "Lecture", loc1);
-        Lesson d = new Lesson(day, 12, 13, true, true, moduleCode, "Lecture", loc1);
-        Option o2 = new Option(Arrays.asList(c, d));
-
-        List<Option> lec = Arrays.asList(o1, o2);
-
-        Option ot1 = new Option(Arrays.asList(new Lesson(day, 4, 5, true, true, moduleCode, "Tutorial", loc2)));
-        Option ot2 = new Option(Arrays.asList(new Lesson(day, 6, 7, true, true, moduleCode, "Tutorial", loc2)));
-
-        List<Option> tut = Arrays.asList(ot1, ot2);
-
-        return new Module(moduleCode, Arrays.asList(lec, tut));
-    }
+    private static SampleModules instance;
+    private List<Module> modules = new ArrayList<>();
 
     public static List<Module> getModules() {
-        Module testMod1 = genModule("ABC1231", 1);
-        Module testMod2 = genModule("DEF1010", 1);
-        Module testMod3 = genModule("GHI2030", 1);
-        Module testMod4 = genModule("JKL2040", 1);
-        Module testMod5 = genModule("MNO2100", 2);
-        Module testMod6 = genModule("PQR3230", 2);
+        return instance.modules;
+    }
 
-        return Arrays.asList(testMod1, testMod2, testMod3, testMod4, testMod5, testMod6);
+    public static void download() {
+        if (instance == null) {
+            instance = new SampleModules();
+            instance.getModsTest("CS2030");
+            instance.getModsTest("CS2040");
+        }
+    }
+
+    private void getModsTest(String code) {
+        new DownloadTask(new DownloadTask.Callback() {
+            @Override
+            public void call(String result) {
+                Log.v("SampleModules", result);
+                createMod(result);
+            }
+        }).execute("https://nusmods.com/api/v2/2018-2019/modules/" + code + ".json");
+    }
+
+    private void createMod(String result) {
+        try {
+            JSONObject jObj = new JSONObject(result);
+            String moduleCode = jObj.getString("moduleCode");
+            JSONArray opts = jObj
+                    .getJSONArray("semesterData")
+                    .getJSONObject(1)
+                    .getJSONArray("timetable");
+            Map<String, Map<String, Option>> map = new HashMap<>();
+            for (int i = 0; i < opts.length(); i++) {
+                insertOption(map, opts.getJSONObject(i), moduleCode);
+            }
+            modules.add(new Module(moduleCode, toList(map)));
+        } catch (JSONException e) {
+            Log.v("SampleModules", e.getMessage());
+        }
+    }
+
+    private void insertOption(Map<String, Map<String, Option>> map, JSONObject opt, String moduleCode)
+            throws JSONException {
+        String lessonType = opt.getString("lessonType");
+        String classNo = opt.getString("classNo");
+        boolean[] oddEven = oddEvenWeeks(opt.getJSONArray("weeks"));
+        Lesson lesson = new Lesson(
+                opt.getString("day"),
+                opt.getString("startTime"),
+                opt.getString("endTime"),
+                oddEven[0],
+                oddEven[1],
+                moduleCode,
+                lessonType,
+                new Location("SoC"));
+        Map<String, Option> options;
+        if (map.containsKey(lessonType)) {
+            options = map.get(lessonType);
+        } else {
+            options = new HashMap<>();
+            map.put(lessonType, options);
+        }
+        assert options != null;
+
+        Option option;
+        if (options.containsKey(classNo)) {
+            option = options.get(classNo);
+        } else {
+            option = new Option(moduleCode, new ArrayList<Lesson>());
+            options.put(classNo, option);
+        }
+        assert option != null;
+        option.list.add(lesson);
+    }
+
+    private boolean[] oddEvenWeeks(JSONArray jWeeks) throws JSONException {
+        Set<Integer> weeks = new HashSet<>();
+        for (int i = 0; i < jWeeks.length(); i++) {
+            weeks.add(jWeeks.getInt(i));
+        }
+        boolean oddWeek = false;
+        boolean evenWeek = false;
+        for (int i = 1; i <= 13; i++) {
+            if (weeks.contains(i)) {
+                if (i % 2 == 1) {
+                    oddWeek = true;
+                } else {
+                    evenWeek = true;
+                }
+            }
+        }
+        return new boolean[] {oddWeek, evenWeek};
+    }
+
+    private List<List<Option>> toList(Map<String, Map<String, Option>> map) {
+        List<List<Option>> list = new ArrayList<>();
+        for (Map<String, Option> optMap : map.values()) {
+            list.add(new ArrayList<>(optMap.values()));
+        }
+        return list;
     }
 
     public static Module getModuleByCode(String code) {
