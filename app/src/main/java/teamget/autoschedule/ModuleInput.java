@@ -77,7 +77,9 @@ public class ModuleInput extends AppCompatActivity implements SearchView.OnQuery
                 List<Module> selectedModules = new ArrayList<>();
                 Map<String, ?> allEntries = modulePref.getAll();
                 for (Map.Entry<String, ?> entry : allEntries.entrySet()) {
-                    selectedModules.add(SampleModules.getModuleByCode(entry.toString()));
+                    Log.v("ModuleInput test", entry.toString());
+                    Log.v("ModuleInput test", entry.getValue().toString());
+                    selectedModules.add(SampleModules.getModuleByCode((String) entry.getValue()));
                 }
                 teamget.autoschedule.schedule.Timetable.test(selectedModules);
 
