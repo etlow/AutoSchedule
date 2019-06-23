@@ -8,7 +8,6 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -18,8 +17,9 @@ import android.widget.ListView;
 import android.widget.SearchView;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 public class ModuleInput extends AppCompatActivity implements SearchView.OnQueryTextListener {
 
@@ -29,7 +29,6 @@ public class ModuleInput extends AppCompatActivity implements SearchView.OnQuery
     ArrayList<Module> moduleList = new ArrayList<Module>();
     SharedPreferences modulePref;
     SharedPreferences.Editor spEditor;
-    int keyCounter = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,9 +51,14 @@ public class ModuleInput extends AppCompatActivity implements SearchView.OnQuery
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Module selectedModule = (Module) parent.getItemAtPosition(position);
-                spEditor.putString("module" + keyCounter, selectedModule.toString());
+                String modCode = selectedModule.getCode();
+
+                Set<String> curr = modulePref.getStringSet("modules", Collections.<String>emptySet());
+                HashSet<String> newSet = new HashSet<>(curr);
+                newSet.add(modCode);
+
+                spEditor.putStringSet("modules", newSet);
                 spEditor.commit();
-                keyCounter++;
 
                 // To-do: Stick selected modules to the top of list with "Added" tag
                 Snackbar.make(findViewById(android.R.id.content),
@@ -73,15 +77,7 @@ public class ModuleInput extends AppCompatActivity implements SearchView.OnQuery
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_done:
-                // For testing
-                List<Module> selectedModules = new ArrayList<>();
-                Map<String, ?> allEntries = modulePref.getAll();
-                for (Map.Entry<String, ?> entry : allEntries.entrySet()) {
-                    Log.v("ModuleInput test", entry.toString());
-                    Log.v("ModuleInput test", entry.getValue().toString());
-                    selectedModules.add(SampleModules.getModuleByCode((String) entry.getValue()));
-                }
-                teamget.autoschedule.schedule.Timetable.test(selectedModules);
+                teamget.autoschedule.schedule.Timetable.test(getApplicationContext());
 
                 Intent intent = new Intent(this, PriorityInput.class);
                 startActivity(intent);

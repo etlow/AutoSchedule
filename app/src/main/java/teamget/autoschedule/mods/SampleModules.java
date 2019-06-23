@@ -42,7 +42,7 @@ public class SampleModules {
     public static Module getModuleByCode(String code) {
         Module selected = null;
         for (Module module : getModules()) {
-            if (module.code.equals(code)) {
+            if (module.getCode().equals(code)) {
                 selected = module;
             }
         }

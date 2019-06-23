@@ -1,13 +1,18 @@
 package teamget.autoschedule.schedule;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import teamget.autoschedule.mods.Lesson;
 import teamget.autoschedule.mods.Module;
 import teamget.autoschedule.mods.Option;
+import teamget.autoschedule.mods.SampleModules;
 
 public class Timetable {
     private int currModule = 0;
@@ -51,7 +56,22 @@ public class Timetable {
         return true;
     }
 
-    public static void test(List<Module> mods) {
+    private static List<Module> getAndClearModules(Context context) {
+        SharedPreferences sharedPref = context.getSharedPreferences(
+                "ModulePreferences", Context.MODE_PRIVATE);
+        Set<String> modSet = sharedPref.getStringSet("modules", Collections.<String>emptySet());
+
+        List<Module> mods = new ArrayList<>();
+        for (String modCode : modSet) {
+            mods.add(SampleModules.getModuleByCode(modCode));
+        }
+        sharedPref.edit().clear().apply();
+        return mods;
+    }
+
+    public static void test(Context context) {
+        List<Module> mods = getAndClearModules(context);
+        Log.v("Timetable", mods.toString());
         Timetable t = new Timetable();
         boolean hasNext = t.next(mods);
         while (hasNext) {
