@@ -20,7 +20,7 @@ public class Timetable {
     private int currList = -1;
     private List<Integer> pos = new ArrayList<>();
     private List<Lesson> table = new ArrayList<>();
-    public boolean next(List<Module> modules) {
+    private boolean next(List<Module> modules) {
         boolean clash = true;
         while (clash) {
             clash = false;
@@ -46,7 +46,7 @@ public class Timetable {
                 Option newOption = modules.get(currModule).list.get(currList).get(optNum + 1);
                 // Check for clashes if newOption is added
                 clash = clashes(newOption);
-                table.addAll(newOption.list);
+                addAll(newOption);
             }
             boolean last = false;
             // Keep adding 0 to pos until last list of last module is reached
@@ -57,7 +57,7 @@ public class Timetable {
                     currList++;
                     Option newOption = typeList.get(currList).get(0);
                     clash = clashes(newOption);
-                    table.addAll(newOption.list);
+                    addAll(newOption);
                 }
                 if (!clash) {
                     if (currModule == modules.size() - 1) {
@@ -69,19 +69,26 @@ public class Timetable {
                     }
                 }
             }
-            Log.v("Timetable", pos.toString());
-            if (clash) Log.v("Timetable", "(Clash)");
         }
         return true;
     }
 
     private boolean clashes(Option option) {
-        for (Lesson lesson : option.list) {
-            for (Lesson tableLesson : table) {
-                if (lesson.overlaps(tableLesson)) return true;
+        // Iterator is slow
+        for (int i = 0; i < option.list.size(); i++) {
+            for (int j = 0; j < table.size(); j++) {
+                if (option.list.get(i).overlaps(table.get(j))) return true;
             }
         }
         return false;
+    }
+
+    private void addAll(Option option) {
+        for (int i = 0; i < option.list.size(); i++) {
+            // 27x faster
+            //noinspection UseBulkOperation
+            table.add(option.list.get(i));
+        }
     }
 
     private static List<Module> getAndClearModules(Context context) {
@@ -103,10 +110,16 @@ public class Timetable {
         if (mods.size() == 0) return;
         Timetable t = new Timetable();
         boolean hasNext = t.next(mods);
+        int i = 0;
         while (hasNext) {
-            Log.v("Timetable", t.toString());
+            if (i % 1000000 == 0) {
+                Log.v("Timetable", t.pos.toString());
+                Log.v("Timetable", t.toString());
+            }
             hasNext = t.next(mods);
+            i++;
         }
+        Log.v("Timetable", "Count: " + i);
     }
 
     @NonNull
