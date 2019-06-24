@@ -20,7 +20,7 @@ public class Timetable {
     private int currList = -1;
     private int numLessons = 0;
     private List<Integer> pos = new ArrayList<>();
-    private List<Lesson> table;
+    private Lesson[] table;
     private boolean next(List<Module> modules) {
         boolean clash = true;
         while (clash) {
@@ -78,9 +78,11 @@ public class Timetable {
     private boolean clashes(Option option) {
         for (int i = 0; i < option.list.size(); i++) {
             Lesson newLesson = option.list.get(i);
-            for (int j = tableStart(newLesson); j < tableEnd(newLesson); j++) {
+            int start = newLesson.day * 24 + newLesson.startHour;
+            int end = newLesson.day * 24 + newLesson.endHour;
+            for (int j = start; j < end; j++) {
                 for (int k = 0; k < numLessons; k++) {
-                    Lesson lesson = table.get(j * numLessons + k);
+                    Lesson lesson = table[j * numLessons + k];
                     if (lesson != null && newLesson.overlaps(lesson)) return true;
                 }
             }
@@ -91,8 +93,10 @@ public class Timetable {
     private void addAll(Option option) {
         for (int i = 0; i < option.list.size(); i++) {
             Lesson newLesson = option.list.get(i);
-            for (int j = tableStart(newLesson); j < tableEnd(newLesson); j++) {
-                table.set(j * numLessons + pos.size() - 1, newLesson);
+            int start = newLesson.day * 24 + newLesson.startHour;
+            int end = newLesson.day * 24 + newLesson.endHour;
+            for (int j = start; j < end; j++) {
+                table[j * numLessons + pos.size() - 1] = newLesson;
             }
         }
     }
@@ -101,24 +105,19 @@ public class Timetable {
         if (pos.isEmpty()) return;
         for (int i = 0; i < option.list.size(); i++) {
             Lesson newLesson = option.list.get(i);
-            for (int j = tableStart(newLesson); j < tableEnd(newLesson); j++) {
-                table.set(j * numLessons + pos.size() - 1, null);
+            int start = newLesson.day * 24 + newLesson.startHour;
+            int end = newLesson.day * 24 + newLesson.endHour;
+            for (int j = start; j < end; j++) {
+                table[j * numLessons + pos.size() - 1] = null;
             }
         }
     }
-
-    private int tableStart(Lesson lesson) { return lesson.day * 24 + lesson.startHour; }
-    private int tableEnd(Lesson lesson) { return lesson.day * 24 + lesson.endHour; }
 
     private void createTable(List<Module> modules) {
         for (int i = 0; i < modules.size(); i++) {
             numLessons += modules.get(i).list.size();
         }
-        List<Lesson> tab = new ArrayList<>();
-        for (int i = 0; i < 7 * 24 * numLessons; i++) {
-            tab.add(null);
-        }
-        table = tab;
+        table = new Lesson[7 * 24 * numLessons];
     }
 
     private static List<Module> getAndClearModules(Context context) {
