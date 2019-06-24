@@ -18,8 +18,9 @@ import teamget.autoschedule.mods.SampleModules;
 public class Timetable {
     private int currModule = 0;
     private int currList = -1;
+    private int numLessons = 0;
     private List<Integer> pos = new ArrayList<>();
-    private List<Lesson> table = new ArrayList<>();
+    private List<Lesson> table;
     private boolean next(List<Module> modules) {
         boolean clash = true;
         while (clash) {
@@ -27,8 +28,9 @@ public class Timetable {
             if (currList != -1) { // Not the first call
                 // Keep removing elements from pos if it's already the last option
                 while (pos.get(pos.size() - 1) == modules.get(currModule).list.get(currList).size() - 1) {
-                    int optNum = pos.remove(pos.size() - 1);
-                    table.removeAll(modules.get(currModule).list.get(currList).get(optNum).list);
+                    int optNum = pos.get(pos.size() - 1);
+                    removeAll(modules.get(currModule).list.get(currList).get(optNum));
+                    pos.remove(pos.size() - 1);
                     if (currList == 0) {
                         if (currModule == 0) {
                             // No more possibilities
@@ -42,7 +44,7 @@ public class Timetable {
                 // Update table to next possibility
                 int optNum = pos.get(pos.size() - 1);
                 pos.set(pos.size() - 1, optNum + 1);
-                table.removeAll(modules.get(currModule).list.get(currList).get(optNum).list);
+                removeAll(modules.get(currModule).list.get(currList).get(optNum));
                 Option newOption = modules.get(currModule).list.get(currList).get(optNum + 1);
                 // Check for clashes if newOption is added
                 clash = clashes(newOption);
@@ -74,10 +76,13 @@ public class Timetable {
     }
 
     private boolean clashes(Option option) {
-        // Iterator is slow
         for (int i = 0; i < option.list.size(); i++) {
-            for (int j = 0; j < table.size(); j++) {
-                if (option.list.get(i).overlaps(table.get(j))) return true;
+            Lesson newLesson = option.list.get(i);
+            for (int j = tableStart(newLesson); j < tableEnd(newLesson); j++) {
+                for (int k = 0; k < numLessons; k++) {
+                    Lesson lesson = table.get(j * numLessons + k);
+                    if (lesson != null && newLesson.overlaps(lesson)) return true;
+                }
             }
         }
         return false;
@@ -85,10 +90,35 @@ public class Timetable {
 
     private void addAll(Option option) {
         for (int i = 0; i < option.list.size(); i++) {
-            // 27x faster
-            //noinspection UseBulkOperation
-            table.add(option.list.get(i));
+            Lesson newLesson = option.list.get(i);
+            for (int j = tableStart(newLesson); j < tableEnd(newLesson); j++) {
+                table.set(j * numLessons + pos.size() - 1, newLesson);
+            }
         }
+    }
+
+    private void removeAll(Option option) {
+        if (pos.isEmpty()) return;
+        for (int i = 0; i < option.list.size(); i++) {
+            Lesson newLesson = option.list.get(i);
+            for (int j = tableStart(newLesson); j < tableEnd(newLesson); j++) {
+                table.set(j * numLessons + pos.size() - 1, null);
+            }
+        }
+    }
+
+    private int tableStart(Lesson lesson) { return lesson.day * 24 + lesson.startHour; }
+    private int tableEnd(Lesson lesson) { return lesson.day * 24 + lesson.endHour; }
+
+    private void createTable(List<Module> modules) {
+        for (int i = 0; i < modules.size(); i++) {
+            numLessons += modules.get(i).list.size();
+        }
+        List<Lesson> tab = new ArrayList<>();
+        for (int i = 0; i < 7 * 24 * numLessons; i++) {
+            tab.add(null);
+        }
+        table = tab;
     }
 
     private static List<Module> getAndClearModules(Context context) {
@@ -109,6 +139,7 @@ public class Timetable {
         Log.v("Timetable", mods.toString());
         if (mods.size() == 0) return;
         Timetable t = new Timetable();
+        t.createTable(mods);
         boolean hasNext = t.next(mods);
         int i = 0;
         while (hasNext) {
@@ -126,7 +157,7 @@ public class Timetable {
     @Override
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
-        for (Lesson l : table) {
+        for (Lesson l : table) if (l != null) {
             stringBuilder.append(l.startHour);
             stringBuilder.append("-");
             stringBuilder.append(l.endHour);

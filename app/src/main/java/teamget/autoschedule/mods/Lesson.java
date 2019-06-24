@@ -13,7 +13,7 @@ public class Lesson {
     public Location location;
 
     public Lesson(String d, String s, String e, boolean oW, boolean eW, String m, String t, Location l) {
-        day = DayOfWeek.valueOf(d.toUpperCase()).ordinal() + 1;
+        day = DayOfWeek.valueOf(d.toUpperCase()).ordinal();
         startHour = parseHour(s);
         endHour = parseHour(e);
         oddWeek = oW;
