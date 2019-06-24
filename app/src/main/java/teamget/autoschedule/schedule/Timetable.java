@@ -20,16 +20,37 @@ public class Timetable {
     private int currList = -1;
     private int numLessons = 0;
     private List<Integer> pos = new ArrayList<>();
+    private Option[][][] modules;
     private Lesson[] table;
-    private boolean next(List<Module> modules) {
+
+    private void setModules(List<Module> modList) {
+        modules = new Option[modList.size()][][];
+        for (int i = 0; i < modules.length; i++) {
+            List<List<Option>> list = modList.get(i).list;
+            Option[][] arr = new Option[list.size()][];
+            modules[i] = arr;
+            numLessons += arr.length;
+            for (int j = 0; j < arr.length; j++) {
+                List<Option> options = list.get(j);
+                Option[] optArr = new Option[options.size()];
+                arr[j] = optArr;
+                for (int k = 0; k < optArr.length; k++) {
+                    optArr[k] = options.get(k);
+                }
+            }
+        }
+        table = new Lesson[7 * 24 * numLessons];
+    }
+
+    private boolean next() {
         boolean clash = true;
         while (clash) {
             clash = false;
             if (currList != -1) { // Not the first call
                 // Keep removing elements from pos if it's already the last option
-                while (pos.get(pos.size() - 1) == modules.get(currModule).list.get(currList).size() - 1) {
+                while (pos.get(pos.size() - 1) == modules[currModule][currList].length - 1) {
                     int optNum = pos.get(pos.size() - 1);
-                    removeAll(modules.get(currModule).list.get(currList).get(optNum));
+                    removeAll(modules[currModule][currList][optNum]);
                     pos.remove(pos.size() - 1);
                     if (currList == 0) {
                         if (currModule == 0) {
@@ -37,15 +58,15 @@ public class Timetable {
                             return false;
                         }
                         currModule--;
-                        currList = modules.get(currModule).list.size();
+                        currList = modules[currModule].length;
                     }
                     currList--;
                 }
                 // Update table to next possibility
                 int optNum = pos.get(pos.size() - 1);
                 pos.set(pos.size() - 1, optNum + 1);
-                removeAll(modules.get(currModule).list.get(currList).get(optNum));
-                Option newOption = modules.get(currModule).list.get(currList).get(optNum + 1);
+                removeAll(modules[currModule][currList][optNum]);
+                Option newOption = modules[currModule][currList][optNum + 1];
                 // Check for clashes if newOption is added
                 clash = clashes(newOption);
                 addAll(newOption);
@@ -53,16 +74,16 @@ public class Timetable {
             boolean last = false;
             // Keep adding 0 to pos until last list of last module is reached
             while (!clash && !last) {
-                List<List<Option>> typeList = modules.get(currModule).list;
-                while (!clash && currList < typeList.size() - 1) {
+                Option[][] typeList = modules[currModule];
+                while (!clash && currList < typeList.length - 1) {
                     pos.add(0);
                     currList++;
-                    Option newOption = typeList.get(currList).get(0);
+                    Option newOption = typeList[currList][0];
                     clash = clashes(newOption);
                     addAll(newOption);
                 }
                 if (!clash) {
-                    if (currModule == modules.size() - 1) {
+                    if (currModule == modules.length - 1) {
                         // Last list of last module
                         last = true;
                     } else {
@@ -113,13 +134,6 @@ public class Timetable {
         }
     }
 
-    private void createTable(List<Module> modules) {
-        for (int i = 0; i < modules.size(); i++) {
-            numLessons += modules.get(i).list.size();
-        }
-        table = new Lesson[7 * 24 * numLessons];
-    }
-
     private static List<Module> getAndClearModules(Context context) {
         SharedPreferences sharedPref = context.getSharedPreferences(
                 "ModulePreferences", Context.MODE_PRIVATE);
@@ -138,15 +152,15 @@ public class Timetable {
         Log.v("Timetable", mods.toString());
         if (mods.size() == 0) return;
         Timetable t = new Timetable();
-        t.createTable(mods);
-        boolean hasNext = t.next(mods);
+        t.setModules(mods);
+        boolean hasNext = t.next();
         int i = 0;
         while (hasNext) {
             if (i % 1000000 == 0) {
                 Log.v("Timetable", t.pos.toString());
                 Log.v("Timetable", t.toString());
             }
-            hasNext = t.next(mods);
+            hasNext = t.next();
             i++;
         }
         Log.v("Timetable", "Count: " + i);
