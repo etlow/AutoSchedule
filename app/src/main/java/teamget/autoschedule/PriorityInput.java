@@ -3,27 +3,32 @@ package teamget.autoschedule;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.NumberPicker;
+import android.widget.TextView;
 
 import com.github.clans.fab.FloatingActionMenu;
 import com.github.clans.fab.FloatingActionButton;
 
 import java.util.Map;
 
-public class PriorityInput extends AppCompatActivity {
+public class PriorityInput extends AppCompatActivity implements NumberPicker.OnValueChangeListener {
+
+    ListFragment lf;
 
     FloatingActionMenu fam;
     FloatingActionButton avoidLessonsBefore, avoidLessonsAfter, maxFreeDays, freePeriod,
                          minTravelling, minBreaks, lunchBreak;
     SharedPreferences priorityPref;
     SharedPreferences.Editor spEditor;
-    int keyCounter = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +36,14 @@ public class PriorityInput extends AppCompatActivity {
         setContentView(R.layout.activity_priority_input);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        priorityPref = getApplicationContext().getSharedPreferences("PriorityPreferences", MODE_PRIVATE);
+        spEditor = priorityPref.edit();
+
+        if (savedInstanceState == null) {
+            lf = ListFragment.newInstance();
+            showFragment(lf);
+        }
 
         fam = (FloatingActionMenu) findViewById(R.id.add_priority_fab);
         avoidLessonsBefore = (FloatingActionButton) findViewById(R.id.avoid_lessons_before_fab);
@@ -41,75 +54,92 @@ public class PriorityInput extends AppCompatActivity {
         minBreaks = (FloatingActionButton) findViewById(R.id.min_breaks_fab);
         lunchBreak = (FloatingActionButton) findViewById(R.id.lunch_break_fab);
 
-        priorityPref = getApplicationContext().getSharedPreferences("PriorityPreferences", MODE_PRIVATE);
-        spEditor = priorityPref.edit();
-
         avoidLessonsBefore.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Avoid lessons before", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null)
-                        .show();
+                DialogFragment beforeTime = new BeforeTimePicker();
+                beforeTime.show(getSupportFragmentManager(),"TimePicker");
+                ((BeforeTimePicker) beforeTime).linkListFragment(lf);
             }
         });
 
         avoidLessonsAfter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Avoid lessons after", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null)
-                        .show();
+                DialogFragment afterTime = new AfterTimePicker();
+                afterTime.show(getSupportFragmentManager(),"TimePicker");
+                ((AfterTimePicker) afterTime).linkListFragment(lf);
             }
         });
 
         maxFreeDays.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Maximum free days", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null)
-                        .show();
+                TextView text = (TextView) findViewById(R.id.text_to_fill);
+                text.setText("I want as many free days as possible.");
+                lf.addItem((String) text.getText().toString());
             }
         });
 
         freePeriod.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Free period during", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null)
-                        .show();
+                FreePeriodPickerDialog newFragment = new FreePeriodPickerDialog();
+                newFragment.show(getSupportFragmentManager(), "free_period_picker");
+                newFragment.linkListFragment(lf);
             }
         });
 
         minTravelling.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Minimal travelling", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null)
-                        .show();
+                TextView text = (TextView) findViewById(R.id.text_to_fill);
+                text.setText("I want minimal travelling across the campus.");
+                lf.addItem((String) text.getText().toString());
             }
         });
 
         minBreaks.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Minimal breaks during", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null)
-                        .show();
+                TextView text = (TextView) findViewById(R.id.text_to_fill);
+                text.setText("I want minimal breaks between classes.");
+                lf.addItem((String) text.getText().toString());
             }
         });
 
         lunchBreak.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Lunch break for", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null)
-                        .show();
+                showNumberPicker(view);
             }
         });
     }
 
+    private void showFragment(Fragment fragment) {
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.container, fragment, "fragment").commit();
+    }
+
+    @Override
+    public void onValueChange(NumberPicker numberPicker, int i, int i1) {
+        //Toast.makeText(this, "selected number " + numberPicker.getValue(), Toast.LENGTH_SHORT).show();
+    }
+
+    public void showNumberPicker(View view){
+        NumberPickerDialog newFragment = new NumberPickerDialog();
+        newFragment.setValueChangeListener(this);
+        newFragment.show(getSupportFragmentManager(), "time_picker");
+        newFragment.linkListFragment(lf);
+    }
+
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.priority_input_action_bar, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
         return true;
     }
 

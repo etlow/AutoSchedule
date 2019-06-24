@@ -9,10 +9,11 @@
     <string name="moduleinput.toolbar.done">Done</string>
     <string name="moduleinput.hint.search">Search for module...</string>
 
-    <string name="priorityinput.toolbar.title">Enter your priorities</string>
+    <string name="priorityinput.toolbar.title">Rank your priorities</string>
     <string name="priorityinput.toolbar.done">Done</string>
 
     <string name="top5timetables.toolbar.title">Choose your timetable</string>
 
     <string name="chosentimetable.toolbar.title">Your timetable</string>
+
 </resources>
