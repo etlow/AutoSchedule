@@ -28,6 +28,8 @@ public class SampleModules {
             instance = new SampleModules();
             instance.getModsTest("CS2030");
             instance.getModsTest("CS2040");
+            instance.getModsTest("GER1000");
+            instance.getModsTest("GEQ1000");
         }
     }
 

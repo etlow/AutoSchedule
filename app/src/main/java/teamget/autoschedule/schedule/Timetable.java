@@ -17,31 +17,74 @@ import teamget.autoschedule.mods.SampleModules;
 
 public class Timetable {
     private int currPos = -1;
-    private int numOptions = 0;
+    private int numEvents = 0;
     private int[] pos;
-    private Option[][] optionsArr;
-    private Lesson[] table;
+    private Event[][][] eventsArr;
+    private Event[] table;
 
     private void setModules(List<Module> modList) {
         for (int i = 0; i < modList.size(); i++) {
-            numOptions += modList.get(i).list.size();
+            numEvents += modList.get(i).list.size();
         }
-        pos = new int[numOptions];
-        table = new Lesson[7 * 24 * numOptions];
+        pos = new int[numEvents];
+        table = new Event[7 * 24 * numEvents];
 
-        optionsArr = new Option[numOptions][];
+        eventsArr = new Event[numEvents][][];
         int nextPos = 0;
         for (int i = 0; i < modList.size(); i++) {
             List<List<Option>> list = modList.get(i).list;
             for (int j = 0; j < list.size(); j++) {
-                List<Option> options = list.get(j);
-                Option[] optArr = new Option[options.size()];
-                optionsArr[nextPos++] = optArr;
-                for (int k = 0; k < optArr.length; k++) {
-                    optArr[k] = options.get(k);
-                }
+                eventsArr[nextPos++] = toEventArr(list.get(j));
             }
         }
+    }
+
+    private static <E> E[] addToArr(E[] arr, List<E> list) {
+        for (int i = 0; i < list.size(); i++) {
+            arr[i] = list.get(i);
+        }
+        return arr;
+    }
+
+    private static Event[][] toEventArr(List<Option> opts) {
+        List<Event[]> events = new ArrayList<>();
+        List<Option> options = new ArrayList<>(opts);
+        while (!options.isEmpty()) {
+            Option option = options.remove(options.size() - 1);
+            List<Option> sameTimeOptions = new ArrayList<>();
+            sameTimeOptions.add(option);
+            for (int k = options.size() - 1; k >= 0; k--) {
+                if (sameTime(option, options.get(k))) {
+                    sameTimeOptions.add(options.remove(k));
+                }
+            }
+            Event[] eventArr = new Event[option.list.size()];
+            for (int i = 0; i < eventArr.length; i++) {
+                eventArr[i] = new Event(option.list.get(i), sameTimeOptions);
+            }
+            events.add(eventArr);
+        }
+        return addToArr(new Event[events.size()][], events);
+    }
+
+    private static boolean sameTime(Option a, Option b) {
+        List<Lesson> aList = new ArrayList<>(a.list);
+        for (Lesson lesson : b.list) {
+            boolean found = false;
+            for (int i = 0; i < aList.size() && !found; i++) {
+                if (sameTime(aList.get(i), lesson)) {
+                    aList.remove(i);
+                    found = true;
+                }
+            }
+            if (!found) return false;
+        }
+        return true;
+    }
+
+    private static boolean sameTime(Lesson a, Lesson b) {
+        return a.day == b.day && a.startHour == b.startHour && a.endHour == b.endHour
+                && a.oddWeek == b.oddWeek && a.evenWeek == b.evenWeek;
     }
 
     private boolean next() {
@@ -49,24 +92,24 @@ public class Timetable {
         do {
             if (currPos != -1) { // Not the first call
                 // Keep removing elements from pos if it's already the last option
-                while (pos[currPos] == optionsArr[currPos].length - 1) {
-                    removeAll(optionsArr[currPos][pos[currPos]]);
+                while (pos[currPos] == eventsArr[currPos].length - 1) {
+                    removeAll(eventsArr[currPos][pos[currPos]]);
                     if (currPos == 0) return false; // No more possibilities
                     currPos--;
                 }
                 // Update table to next option
                 int optNum = pos[currPos]++;
-                removeAll(optionsArr[currPos][optNum]);
-                Option newOption = optionsArr[currPos][optNum + 1];
+                removeAll(eventsArr[currPos][optNum]);
+                Event[] newOption = eventsArr[currPos][optNum + 1];
                 // Check for clashes if newOption is added
                 clash = clashes(newOption);
                 addAll(newOption);
             }
             // Keep adding 0 to pos until last list is reached
-            while (!clash && currPos < numOptions - 1) {
+            while (!clash && currPos < numEvents - 1) {
                 currPos++;
                 pos[currPos] = 0;
-                Option newOption = optionsArr[currPos][0];
+                Event[] newOption = eventsArr[currPos][0];
                 clash = clashes(newOption);
                 addAll(newOption);
             }
@@ -74,39 +117,36 @@ public class Timetable {
         return true;
     }
 
-    private boolean clashes(Option option) {
-        for (int i = 0; i < option.list.size(); i++) {
-            Lesson newLesson = option.list.get(i);
-            int start = newLesson.day * 24 + newLesson.startHour;
-            int end = newLesson.day * 24 + newLesson.endHour;
+    private boolean clashes(Event[] eventArr) {
+        for (Event newEvent : eventArr) {
+            int start = newEvent.day * 24 + newEvent.startHour;
+            int end = newEvent.day * 24 + newEvent.endHour;
             for (int j = start; j < end; j++) {
-                for (int k = 0; k < numOptions; k++) {
-                    Lesson lesson = table[j * numOptions + k];
-                    if (lesson != null && newLesson.overlaps(lesson)) return true;
+                for (int k = 0; k < numEvents; k++) {
+                    Event event = table[j * numEvents + k];
+                    if (event != null && newEvent.overlaps(event)) return true;
                 }
             }
         }
         return false;
     }
 
-    private void addAll(Option option) {
-        for (int i = 0; i < option.list.size(); i++) {
-            Lesson newLesson = option.list.get(i);
-            int start = newLesson.day * 24 + newLesson.startHour;
-            int end = newLesson.day * 24 + newLesson.endHour;
+    private void addAll(Event[] eventArr) {
+        for (Event newEvent : eventArr) {
+            int start = newEvent.day * 24 + newEvent.startHour;
+            int end = newEvent.day * 24 + newEvent.endHour;
             for (int j = start; j < end; j++) {
-                table[j * numOptions + currPos] = newLesson;
+                table[j * numEvents + currPos] = newEvent;
             }
         }
     }
 
-    private void removeAll(Option option) {
-        for (int i = 0; i < option.list.size(); i++) {
-            Lesson newLesson = option.list.get(i);
-            int start = newLesson.day * 24 + newLesson.startHour;
-            int end = newLesson.day * 24 + newLesson.endHour;
+    private void removeAll(Event[] eventArr) {
+        for (Event newEvent : eventArr) {
+            int start = newEvent.day * 24 + newEvent.startHour;
+            int end = newEvent.day * 24 + newEvent.endHour;
             for (int j = start; j < end; j++) {
-                table[j * numOptions + currPos] = null;
+                table[j * numEvents + currPos] = null;
             }
         }
     }
@@ -147,13 +187,13 @@ public class Timetable {
     @Override
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
-        for (Lesson l : table) if (l != null) {
+        for (Event l : table) if (l != null) {
             stringBuilder.append(l.startHour);
             stringBuilder.append("-");
             stringBuilder.append(l.endHour);
-            stringBuilder.append(l.moduleCode);
-            stringBuilder.append(l.type);
-            stringBuilder.append(l.location);
+            stringBuilder.append(l.options.get(0).list.get(0).moduleCode);
+            stringBuilder.append(l.options.get(0).list.get(0).type);
+            stringBuilder.append(l.options.get(0).list.get(0).location);
             stringBuilder.append(" ");
         }
         return stringBuilder.toString();
