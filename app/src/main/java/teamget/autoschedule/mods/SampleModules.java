@@ -81,7 +81,7 @@ public class SampleModules {
                 weekList,
                 moduleCode,
                 lessonType,
-                new Location("SoC"));
+                new Location(opt.getString("venue")));
         Map<String, Option> options;
         if (map.containsKey(lessonType)) {
             options = map.get(lessonType);
