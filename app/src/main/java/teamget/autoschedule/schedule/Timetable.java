@@ -117,7 +117,14 @@ public class Timetable {
 
     private static boolean sameTime(Lesson a, Lesson b) {
         return a.day == b.day && a.startHour == b.startHour && a.endHour == b.endHour
-                && a.oddWeek == b.oddWeek && a.evenWeek == b.evenWeek;
+                && sameWeeks(a.weeks, b.weeks);
+    }
+
+    private static boolean sameWeeks(List<Boolean> a, List<Boolean> b) {
+        for (int i = 0; i < a.size(); i++) {
+            if (a.get(i) != b.get(i)) return false;
+        }
+        return true;
     }
 
     private boolean next() {

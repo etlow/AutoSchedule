@@ -8,10 +8,8 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import teamget.autoschedule.DownloadTask;
 
@@ -65,13 +63,22 @@ public class SampleModules {
             throws JSONException {
         String lessonType = opt.getString("lessonType");
         String classNo = opt.getString("classNo");
-        boolean[] oddEven = oddEvenWeeks(opt.getJSONArray("weeks"));
+        List<Boolean> weekList = toWeekList(opt.getJSONArray("weeks"));
+        boolean weeksSpecial = isSpecial(weekList);
+        boolean oddWeeks = false;
+        boolean evenWeeks = false;
+        if (!weeksSpecial) {
+            oddWeeks = weekList.get(0);
+            evenWeeks = weekList.get(1);
+        }
         Lesson lesson = new Lesson(
                 opt.getString("day"),
                 opt.getString("startTime"),
                 opt.getString("endTime"),
-                oddEven[0],
-                oddEven[1],
+                oddWeeks,
+                evenWeeks,
+                weeksSpecial,
+                weekList,
                 moduleCode,
                 lessonType,
                 new Location("SoC"));
@@ -95,23 +102,23 @@ public class SampleModules {
         option.list.add(lesson);
     }
 
-    private boolean[] oddEvenWeeks(JSONArray jWeeks) throws JSONException {
-        Set<Integer> weeks = new HashSet<>();
+    private static List<Boolean> toWeekList(JSONArray jWeeks) throws JSONException {
+        List<Boolean> weekList = new ArrayList<>();
+        for (int i = 0; i < 13; i++) {
+            weekList.add(false);
+        }
         for (int i = 0; i < jWeeks.length(); i++) {
-            weeks.add(jWeeks.getInt(i));
+            weekList.set(jWeeks.getInt(i) - 1, true);
         }
-        boolean oddWeek = false;
-        boolean evenWeek = false;
-        for (int i = 1; i <= 13; i++) {
-            if (weeks.contains(i)) {
-                if (i % 2 == 1) {
-                    oddWeek = true;
-                } else {
-                    evenWeek = true;
-                }
-            }
-        }
-        return new boolean[] {oddWeek, evenWeek};
+        return weekList;
+    }
+
+    private static boolean isSpecial(List<Boolean> weekList) {
+        boolean firstWeek = weekList.get(0);
+        boolean secondWeek = weekList.get(1);
+        for (int i = 2; i < 13; i += 2) if (weekList.get(i) != firstWeek) return true;
+        for (int i = 3; i < 13; i += 2) if (weekList.get(i) != secondWeek) return true;
+        return false;
     }
 
     private List<List<Option>> toList(Map<String, Map<String, Option>> map) {
