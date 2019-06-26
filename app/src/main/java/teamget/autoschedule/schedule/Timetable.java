@@ -6,7 +6,9 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
@@ -19,7 +21,7 @@ public class Timetable {
     private int currPos = -1;
     private int numEvents = 0;
     private int[] pos;
-    private Event[][][] eventsArr;
+    private Event[][][] toBeScheduled;
     private Event[] table;
 
     private void setModules(List<Module> modList) {
@@ -29,14 +31,45 @@ public class Timetable {
         pos = new int[numEvents];
         table = new Event[7 * 24 * numEvents];
 
-        eventsArr = new Event[numEvents][][];
+        toBeScheduled = new Event[numEvents][][];
         int nextPos = 0;
         for (int i = 0; i < modList.size(); i++) {
             List<List<Option>> list = modList.get(i).list;
             for (int j = 0; j < list.size(); j++) {
-                eventsArr[nextPos++] = toEventArr(list.get(j));
+                toBeScheduled[nextPos++] = toEventArr(list.get(j));
             }
         }
+        Arrays.sort(toBeScheduled, new Comparator<Event[][]>() {
+            @Override
+            public int compare(Event[][] events, Event[][] t1) {
+                return events.length - t1.length;
+            }
+        });
+    }
+
+    private void setEvents(List<Event> fixed, List<List<List<Event>>> options) {
+        List<List<List<Event>>> reqList = new ArrayList<>(options);
+        reqList.add(Collections.singletonList(fixed));
+        numEvents = reqList.size();
+        pos = new int[numEvents];
+        table = new Event[7 * 24 * numEvents];
+
+        toBeScheduled = new Event[numEvents][][];
+        for (int i = 0; i < numEvents; i++) {
+            List<List<Event>> eventsList = reqList.get(i);
+            Event[][] eventsArr = new Event[eventsList.size()][];
+            toBeScheduled[i] = eventsArr;
+            for (int j = 0; j < eventsArr.length; j++) {
+                List<Event> eventList = eventsList.get(j);
+                eventsArr[j] = addToArr(new Event[eventList.size()], eventList);
+            }
+        }
+        Arrays.sort(toBeScheduled, new Comparator<Event[][]>() {
+            @Override
+            public int compare(Event[][] events, Event[][] t1) {
+                return events.length - t1.length;
+            }
+        });
     }
 
     private static <E> E[] addToArr(E[] arr, List<E> list) {
@@ -92,15 +125,15 @@ public class Timetable {
         do {
             if (currPos != -1) { // Not the first call
                 // Keep removing elements from pos if it's already the last option
-                while (pos[currPos] == eventsArr[currPos].length - 1) {
-                    removeAll(eventsArr[currPos][pos[currPos]]);
+                while (pos[currPos] == toBeScheduled[currPos].length - 1) {
+                    removeAll(toBeScheduled[currPos][pos[currPos]]);
                     if (currPos == 0) return false; // No more possibilities
                     currPos--;
                 }
                 // Update table to next option
                 int optNum = pos[currPos]++;
-                removeAll(eventsArr[currPos][optNum]);
-                Event[] newOption = eventsArr[currPos][optNum + 1];
+                removeAll(toBeScheduled[currPos][optNum]);
+                Event[] newOption = toBeScheduled[currPos][optNum + 1];
                 // Check for clashes if newOption is added
                 clash = clashes(newOption);
                 addAll(newOption);
@@ -109,7 +142,7 @@ public class Timetable {
             while (!clash && currPos < numEvents - 1) {
                 currPos++;
                 pos[currPos] = 0;
-                Event[] newOption = eventsArr[currPos][0];
+                Event[] newOption = toBeScheduled[currPos][0];
                 clash = clashes(newOption);
                 addAll(newOption);
             }
