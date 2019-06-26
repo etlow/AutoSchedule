@@ -18,7 +18,10 @@ import android.widget.TextView;
 import com.github.clans.fab.FloatingActionMenu;
 import com.github.clans.fab.FloatingActionButton;
 
+import java.util.List;
 import java.util.Map;
+
+import teamget.autoschedule.schedule.Priority;
 
 public class PriorityInput extends AppCompatActivity implements NumberPicker.OnValueChangeListener {
 
@@ -27,6 +30,9 @@ public class PriorityInput extends AppCompatActivity implements NumberPicker.OnV
     FloatingActionMenu fam;
     FloatingActionButton avoidLessonsBefore, avoidLessonsAfter, maxFreeDays, freePeriod,
                          minTravelling, minBreaks, lunchBreak;
+
+    List<Priority> priorityList;
+
     SharedPreferences priorityPref;
     SharedPreferences.Editor spEditor;
 
@@ -157,6 +163,9 @@ public class PriorityInput extends AppCompatActivity implements NumberPicker.OnV
                 for (Map.Entry<String, ?> entry : allEntries.entrySet()) {
                     Log.d("map values", entry.getKey() + ": " + entry.getValue().toString());
                 }
+
+                // Upload priorities into SharedPreferences via Gson
+                //
 
                 Intent intent = new Intent(this, Top5Timetables.class);
                 startActivity(intent);

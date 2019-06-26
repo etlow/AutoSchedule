@@ -12,7 +12,7 @@ public class FreePeriodPickerDialog extends DialogFragment {
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        final String[] weekdays = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday"};
+        final String[] weekdays = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Every day"};
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle("I want to be free on...");

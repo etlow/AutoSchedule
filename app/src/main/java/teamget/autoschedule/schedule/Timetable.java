@@ -22,7 +22,7 @@ public class Timetable {
     private int numEvents = 0;
     private int[] pos;
     private Event[][][] toBeScheduled;
-    private Event[] table;
+    public Event[] table;
 
     private void setModules(List<Module> modList) {
         for (int i = 0; i < modList.size(); i++) {
@@ -221,6 +221,22 @@ public class Timetable {
             i++;
         }
         Log.v("Timetable", "Count: " + i);
+    }
+
+    public void arrangeTimetable() {
+        Comparator<Event> arrangeChronologically = new Comparator<Event>() {
+            @Override
+            public int compare(Event o1, Event o2) {
+                if (o1.day != o2.day) {
+                    return o1.day - o2.day;
+                } else {
+                    return o1.startHour - o2.startHour;
+                }
+            }
+        };
+        List<Event> timetableList = Arrays.asList(this.table);
+        Collections.sort(timetableList, arrangeChronologically);
+        this.table = timetableList.toArray(new Event[timetableList.size()]);
     }
 
     @NonNull
