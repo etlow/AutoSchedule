@@ -19,7 +19,7 @@ public class MinimalTravellingPriority extends Priority {
         maxPossibleDist = max;
     }
 
-    private Location findStartingLocationOfDay(Timetable t, int day) {
+    private Location findStartingLocationOfDay(TimetableGeneration t, int day) {
         Location startingLocation = t.table[0].options.get(0).list.get(0).location;
         for (Event l : t.table) {
             if (l.day == day) {
@@ -30,7 +30,7 @@ public class MinimalTravellingPriority extends Priority {
         return startingLocation;
     }
 
-    private double findDistance(Timetable t) {
+    private double findDistance(TimetableGeneration t) {
         t.arrangeTimetable();
 
         double totalDist = 0;
@@ -61,7 +61,7 @@ public class MinimalTravellingPriority extends Priority {
     }
 
     @Override
-    public double getScoreMultiplier(Timetable t) {
+    public double getScoreMultiplier(TimetableGeneration t) {
         double multiplier = (maxPossibleDist - findDistance(t)) / (maxPossibleDist - minPossibleDist);
         return multiplier;
     }

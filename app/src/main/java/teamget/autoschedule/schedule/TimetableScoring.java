@@ -1,9 +1,9 @@
 package teamget.autoschedule.schedule;
 
 public class TimetableScoring {
-    Timetable timetable;
+    TimetableGeneration timetable;
 
-    public TimetableScoring(Timetable timetable) {
+    public TimetableScoring(TimetableGeneration timetable) {
         this.timetable = timetable;
     }
 

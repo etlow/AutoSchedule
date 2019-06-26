@@ -13,7 +13,7 @@ public class FreePeriodPriority extends Priority {
     }
 
     @Override
-    public double getScoreMultiplier(Timetable t) {
+    public double getScoreMultiplier(TimetableGeneration t) {
         double multiplier = 1;
         if (day == 5) {     // every day = 5
             for (int d = 0; d <= 4; d++) {

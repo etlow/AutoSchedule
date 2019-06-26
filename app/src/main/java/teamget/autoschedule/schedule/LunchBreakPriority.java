@@ -1,7 +1,5 @@
 package teamget.autoschedule.schedule;
 
-import teamget.autoschedule.mods.Lesson;
-
 public class LunchBreakPriority extends Priority {
     int hours;
 
@@ -12,7 +10,7 @@ public class LunchBreakPriority extends Priority {
 
     // Assumption: lunch hours from 10:00 to 15:00
     @Override
-    public double getScoreMultiplier(Timetable t) {
+    public double getScoreMultiplier(TimetableGeneration t) {
         double multiplier = 1;
         boolean isFree = false;
         for (int day = 0; day <= 4; day++) {

@@ -12,7 +12,7 @@ public class MaxFreeDaysPriority extends Priority {
     }
 
     // Run findMaxFreeDays for every timetable, then take the max and set as maxPossibleFreeDays
-    private int findMaxFreeDays(Timetable t) {
+    private int findMaxFreeDays(TimetableGeneration t) {
         int maxFreeDays = 5;
         for (int day = 0; day <= 4; day++) {
             for (Event l : t.table) {
@@ -26,7 +26,7 @@ public class MaxFreeDaysPriority extends Priority {
     }
 
     @Override
-    public double getScoreMultiplier(Timetable t) {
+    public double getScoreMultiplier(TimetableGeneration t) {
         int maxFreeDays = findMaxFreeDays(t);
         double multiplier = maxFreeDays / maxPossibleFreeDays;
         return multiplier;

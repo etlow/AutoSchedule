@@ -1,6 +1,7 @@
 package teamget.autoschedule;
 
 import teamget.autoschedule.mods.*;
+import teamget.autoschedule.schedule.TimetableGeneration;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -77,7 +78,7 @@ public class ModuleInput extends AppCompatActivity implements SearchView.OnQuery
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_done:
-                teamget.autoschedule.schedule.Timetable.test(getApplicationContext());
+                TimetableGeneration.test(getApplicationContext());
 
                 Intent intent = new Intent(this, PriorityInput.class);
                 startActivity(intent);

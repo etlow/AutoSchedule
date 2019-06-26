@@ -1,11 +1,5 @@
 package teamget.autoschedule.schedule;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-
 public class MinimalBreaksPriority extends Priority {
     static int maxHoursOfBreaks;
 
@@ -17,7 +11,7 @@ public class MinimalBreaksPriority extends Priority {
         maxHoursOfBreaks = i;
     }
 
-    private int findHoursOfBreaks(Timetable t) {
+    private int findHoursOfBreaks(TimetableGeneration t) {
         t.arrangeTimetable();
 
         int hoursOfBreaks = 0;
@@ -42,7 +36,7 @@ public class MinimalBreaksPriority extends Priority {
     }
 
     @Override
-    public double getScoreMultiplier(Timetable t) {
+    public double getScoreMultiplier(TimetableGeneration t) {
         int hoursOfBreaks = findHoursOfBreaks(t);
         double multiplier = (maxHoursOfBreaks - hoursOfBreaks) / maxHoursOfBreaks;
         return multiplier;
