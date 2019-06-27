@@ -78,8 +78,6 @@ public class ModuleInput extends AppCompatActivity implements SearchView.OnQuery
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_done:
-                TimetableGeneration.test(getApplicationContext());
-
                 Intent intent = new Intent(this, PriorityInput.class);
                 startActivity(intent);
                 return true;

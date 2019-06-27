@@ -1,9 +1,11 @@
 package teamget.autoschedule;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 
 import com.google.gson.Gson;
 
@@ -47,7 +49,9 @@ public class Top5Timetables extends AppCompatActivity {
         }
 
         // For testing
-        for (String s : moduleCodes) { Log.d("module check", "module: " + s); }
+        for (String s : moduleCodes) {
+            Log.d("module check", "module: " + s);
+        }
 
         // Generate list of timetables
         TimetableGeneration tg = new TimetableGeneration();
@@ -58,8 +62,16 @@ public class Top5Timetables extends AppCompatActivity {
         TimetableScoring.arrangeTimetablesByScore(timetables);
 
         // Present top 5 timetables
+        findViewById(R.id.buttonBasic).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Top5Timetables.this, NUSTimetableActivity.class);
+                startActivity(intent);
+            }
+        });
+
         // Include option to open another 5
     }
 
-    // OnClick: Choose timetable -> ChosenTimetable activity
+    // OnClick: Choose timetable -> TimetableViewer activity
 }

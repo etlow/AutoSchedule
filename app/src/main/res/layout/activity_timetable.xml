@@ -4,10 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Top5Timetables">
+    tools:context=".TimetableActivity">
 
     <android.support.design.widget.AppBarLayout
-        android:id="@+id/appBarLayout3"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:theme="@style/AppTheme.AppBarOverlay"
@@ -21,11 +20,11 @@
             app:popupTheme="@style/AppTheme.PopupOverlay">
 
             <TextView
-                android:id="@+id/top5_timetables_title"
+                android:id="@+id/timetable_viewer_title"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="start"
-                android:text="@string/top5timetables.toolbar.title"
+                android:text="@string/timetableviewer.toolbar.title"
                 android:textColor="@color/colorWhite"
                 android:textSize="22sp"
                 android:textStyle="bold" />
@@ -34,13 +33,22 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <Button
-        android:id="@+id/buttonBasic"
-        style="@style/Button"
+    <com.alamkanak.weekview.WeekView
+        android:id="@+id/weekView"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:text="Timetable"
-        app:layout_constraintTop_toBottomOf="@+id/appBarLayout3" />
+        android:layout_height="match_parent"
+        app:eventTextColor="@android:color/white"
+        app:textSize="12sp"
+        app:hourHeight="60dp"
+        app:headerColumnPadding="8dp"
+        app:headerColumnTextColor="#8f000000"
+        app:headerRowPadding="12dp"
+        app:columnGap="8dp"
+        app:noOfVisibleDays="3"
+        app:headerRowBackgroundColor="#ffefefef"
+        app:dayBackgroundColor="#05000000"
+        app:todayBackgroundColor="#1848adff"
+        app:headerColumnBackground="#ffffffff"/>
 
     <include
         android:id="@+id/include2"
