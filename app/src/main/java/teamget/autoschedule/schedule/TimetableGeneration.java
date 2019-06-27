@@ -24,7 +24,7 @@ public class TimetableGeneration {
     private Event[][][] toBeScheduled;
     private Event[] table;
 
-    private void setModules(List<Module> modList) {
+    public void setModules(List<Module> modList) {
         for (int i = 0; i < modList.size(); i++) {
             numEvents += modList.get(i).list.size();
         }
@@ -79,6 +79,15 @@ public class TimetableGeneration {
             Collections.addAll(events, eventArr);
         }
         return new Timetable(events);
+    }
+
+    public List<Timetable> getListOfTimetables() {
+        List<Timetable> list = new ArrayList<>();
+        list.add(getTimetable());
+        while (next()) {
+            list.add(getTimetable());
+        }
+        return list;
     }
 
     private static <E> E[] addToArr(E[] arr, List<E> list) {

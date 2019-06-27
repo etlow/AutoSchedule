@@ -2,7 +2,7 @@ package teamget.autoschedule.schedule;
 
 public abstract class Priority {
     static int priorityCount = 0;
-    int rank;
+    public int rank;
 
     public Priority(int rank) {
         this.rank = rank;
