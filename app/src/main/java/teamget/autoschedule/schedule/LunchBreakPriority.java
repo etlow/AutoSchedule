@@ -16,9 +16,9 @@ public class LunchBreakPriority extends Priority {
         for (int day = 0; day <= 4; day++) {
             for (int from = 10; from + hours <= 15; from++) {
                 if (isFree) { break; } else {
-                    for (Event l : t.table) {
-                        if (l.day != day) { continue; }
-                        if (l.startHour < from + hours && l.endHour > from) { break; }
+                    for (Event e : t.events) {
+                        if (e.day != day) { continue; }
+                        if (e.startHour < from + hours && e.endHour > from) { break; }
                         isFree = true;
                     }
                 }

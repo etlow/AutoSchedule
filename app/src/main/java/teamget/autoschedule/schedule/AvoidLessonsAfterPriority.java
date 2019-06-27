@@ -14,8 +14,8 @@ public class AvoidLessonsAfterPriority extends Priority {
     public double getScoreMultiplier(TimetableGeneration t) {
         double multiplier = 1;
         for (int day = 0; day <= 4; day++) {
-            for (Event l : t.table) {
-                if (l.endHour > time && l.day == day) {
+            for (Event e : t.events) {
+                if (e.endHour > time && e.day == day) {
                     multiplier = multiplier - 0.2;
                     break;
                 }

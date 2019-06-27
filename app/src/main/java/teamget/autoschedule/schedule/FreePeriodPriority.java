@@ -17,16 +17,16 @@ public class FreePeriodPriority extends Priority {
         double multiplier = 1;
         if (day == 5) {     // every day = 5
             for (int d = 0; d <= 4; d++) {
-                for (Event l : t.table) {
-                    if (l.day == d && l.startHour < toTime && l.endHour > fromTime) {
+                for (Event e : t.events) {
+                    if (e.day == d && e.startHour < toTime && e.endHour > fromTime) {
                         multiplier = multiplier - 0.2;
                         break;
                     }
                 }
             }
         } else {            // specific day of week
-            for (Event l : t.table) {
-                if (l.day == day && l.startHour < toTime && l.endHour > fromTime) {
+            for (Event e : t.events) {
+                if (e.day == day && e.startHour < toTime && e.endHour > fromTime) {
                     multiplier = 0;
                     break;
                 }

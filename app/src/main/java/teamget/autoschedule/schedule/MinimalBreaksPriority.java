@@ -1,5 +1,11 @@
 package teamget.autoschedule.schedule;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
 public class MinimalBreaksPriority extends Priority {
     static int maxHoursOfBreaks;
 
@@ -11,23 +17,23 @@ public class MinimalBreaksPriority extends Priority {
         maxHoursOfBreaks = i;
     }
 
-    private int findHoursOfBreaks(TimetableGeneration t) {
+    private static int findHoursOfBreaks(Timetable t) {
         t.arrangeTimetable();
 
         int hoursOfBreaks = 0;
-        int prevDay = t.table[0].day;
-        int prevEndHour = t.table[0].endHour;
+        int prevDay = t.events.get(0).day;
+        int prevEndHour = t.events.get(0).endHour;
 
         for (int day = 0; day <= 4; day++) {
-            for (Event l : t.table) {
-                if (l.day == prevDay) {
-                    if (l.startHour > prevEndHour) {
-                        hoursOfBreaks = hoursOfBreaks + (l.startHour - prevEndHour);
+            for (Event e : t.events) {
+                if (e.day == prevDay) {
+                    if (e.startHour > prevEndHour) {
+                        hoursOfBreaks = hoursOfBreaks + (e.startHour - prevEndHour);
                     }
-                    prevEndHour = l.endHour;
+                    prevEndHour = e.endHour;
                 } else {
-                    prevDay = l.day;
-                    prevEndHour = l.endHour;
+                    prevDay = e.day;
+                    prevEndHour = e.endHour;
                 }
             }
         }
@@ -36,7 +42,7 @@ public class MinimalBreaksPriority extends Priority {
     }
 
     @Override
-    public double getScoreMultiplier(TimetableGeneration t) {
+    public double getScoreMultiplier(Timetable t) {
         int hoursOfBreaks = findHoursOfBreaks(t);
         double multiplier = (maxHoursOfBreaks - hoursOfBreaks) / maxHoursOfBreaks;
         return multiplier;
