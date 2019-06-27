@@ -28,7 +28,7 @@ public class FreePeriodFromTimePicker extends DialogFragment implements TimePick
                 this, hour, minute, DateFormat.is24HourFormat(getActivity()));
 
         TextView tvTitle = new TextView(getActivity());
-        tvTitle.setText("I want to be free on " + day + " from...");
+        tvTitle.setText("I want to be free on " + day.substring(0,3) + " from...");
         tvTitle.setTextColor(getResources().getColor(R.color.colorPrimaryDark));
         tvTitle.setBackgroundColor(getResources().getColor(R.color.colorPrimaryLight));
         tvTitle.setPadding(5, 3, 5, 3);
@@ -41,7 +41,7 @@ public class FreePeriodFromTimePicker extends DialogFragment implements TimePick
     public void linkListFragment(ListFragment lf) {
         this.lf = lf;
     }
-    public void linkDay(String day) { this.day = day.substring(0,3); }
+    public void linkDay(String day) { this.day = day; }
 
     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
         DialogFragment toTime = new FreePeriodToTimePicker();

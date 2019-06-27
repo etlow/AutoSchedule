@@ -34,7 +34,7 @@ public class MinimalTravellingPriority extends Priority {
         t.arrangeTimetable();
 
         double totalDist = 0;
-        int prevDay = t.table[0].day;
+        int prevDay = t.events.get(0).day;
         Location prevLocation = findStartingLocationOfDay(t, 0);
 
         for (int day = 0; day <= 4; day++) {

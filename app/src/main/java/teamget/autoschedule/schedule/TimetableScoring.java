@@ -1,11 +1,17 @@
 package teamget.autoschedule.schedule;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class TimetableScoring {
-    List<Priority> priorities;
+    static List<Priority> priorities;
 
-    private void findMinMaxValues(List<Timetable> list) {
+    public TimetableScoring(List<Priority> priorities) {
+        this.priorities = priorities;
+    }
+
+    private static void findMinMaxValues(List<Timetable> list) {
         double minPossibleDist = 10000000;
         double maxPossibleDist = 0;
         int maxFreeDays = 0;
@@ -23,7 +29,7 @@ public class TimetableScoring {
         }
     }
 
-    public void getTimetableScore(Timetable t) {
+    public static void getTimetableScore(Timetable t) {
         // get individual score from all priorities
         double timetableScore = 0;
         for (Priority p : priorities) {
@@ -32,7 +38,7 @@ public class TimetableScoring {
         t.setScore(timetableScore);
     }
 
-    public void arrangeTimetablesByScore(List<Timetable> list) {
+    public static void arrangeTimetablesByScore(List<Timetable> list) {
         // run once to get min+max distance and max free days
         findMinMaxValues(list);
 
@@ -42,6 +48,12 @@ public class TimetableScoring {
         }
 
         // sort list by decreasing score
-
+        Comparator<Timetable> decreasingScore = new Comparator<Timetable>() {
+            @Override
+            public int compare(Timetable o1, Timetable o2) {
+                return Double.compare(o2.score, o1.score);
+            }
+        };
+        Collections.sort(list, decreasingScore);
     }
 }

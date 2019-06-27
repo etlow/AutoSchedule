@@ -11,7 +11,7 @@ public class AvoidLessonsBeforePriority extends Priority {
     // Assumes only 5 days a week (Mon to Fri) with lessons
     // Does not take into account "fixed slot" lessons
     @Override
-    public double getScoreMultiplier(TimetableGeneration t) {
+    public double getScoreMultiplier(Timetable t) {
         double multiplier = 1;
         for (int day = 0; day <= 4; day++) {
             for (Event e : t.events) {

@@ -10,7 +10,7 @@ public class LunchBreakPriority extends Priority {
 
     // Assumption: lunch hours from 10:00 to 15:00
     @Override
-    public double getScoreMultiplier(TimetableGeneration t) {
+    public double getScoreMultiplier(Timetable t) {
         double multiplier = 1;
         boolean isFree = false;
         for (int day = 0; day <= 4; day++) {

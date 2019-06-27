@@ -10,8 +10,12 @@ import android.view.Gravity;
 import android.widget.TextView;
 import android.support.v4.app.DialogFragment;
 import android.app.Dialog;
+
+import java.time.DayOfWeek;
 import java.util.Calendar;
 import android.widget.TimePicker;
+
+import teamget.autoschedule.schedule.FreePeriodPriority;
 
 public class FreePeriodToTimePicker extends DialogFragment implements TimePickerDialog.OnTimeSetListener{
     ListFragment lf = null;
@@ -30,7 +34,8 @@ public class FreePeriodToTimePicker extends DialogFragment implements TimePicker
                 this, hour, minute, DateFormat.is24HourFormat(getActivity()));
 
         TextView tvTitle = new TextView(getActivity());
-        tvTitle.setText(String.format("I want to be free on %s from %d:%02d to...", day, fromTimeHour, fromTimeMinute));
+        tvTitle.setText(String.format("I want to be free on %s from %d:%02d to...",
+                        day.substring(0,3), fromTimeHour, fromTimeMinute));
         tvTitle.setTextColor(getResources().getColor(R.color.colorPrimaryDark));
         tvTitle.setBackgroundColor(getResources().getColor(R.color.colorPrimaryLight));
         tvTitle.setPadding(5, 3, 5, 3);
@@ -52,7 +57,8 @@ public class FreePeriodToTimePicker extends DialogFragment implements TimePicker
     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
         TextView text = (TextView) getActivity().findViewById(R.id.text_to_fill);
         text.setText(String.format("I want to be free on %s from %d:%02d to %d:%02d.",
-                            day, fromTimeHour, fromTimeMinute, hourOfDay, minute));
-        lf.addItem((String) text.getText().toString());
+                            day.substring(0,3), fromTimeHour, fromTimeMinute, hourOfDay, minute));
+        int dayID = day.equals("Every day") ? 5 : DayOfWeek.valueOf(day.toUpperCase()).ordinal();
+        lf.addItem((String) text.getText().toString(), new FreePeriodPriority(0, dayID, fromTimeHour, hourOfDay));
     }
 }

@@ -13,6 +13,8 @@ import android.app.Dialog;
 import java.util.Calendar;
 import android.widget.TimePicker;
 
+import teamget.autoschedule.schedule.AvoidLessonsAfterPriority;
+
 public class AfterTimePicker extends DialogFragment implements TimePickerDialog.OnTimeSetListener{
     ListFragment lf = null;
 
@@ -44,6 +46,6 @@ public class AfterTimePicker extends DialogFragment implements TimePickerDialog.
     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
         TextView text = (TextView) getActivity().findViewById(R.id.text_to_fill);
         text.setText(String.format("Avoid lessons after %d:%02d", hourOfDay, minute));
-        lf.addItem((String) text.getText().toString());
+        lf.addItem((String) text.getText().toString(), new AvoidLessonsAfterPriority(0, hourOfDay));
     }
 }

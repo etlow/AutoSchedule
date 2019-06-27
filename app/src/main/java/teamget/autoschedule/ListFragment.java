@@ -25,14 +25,20 @@ import com.woxthebox.draglistview.swipe.ListSwipeHelper;
 import com.woxthebox.draglistview.swipe.ListSwipeItem;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import teamget.autoschedule.schedule.Priority;
 
 public class ListFragment extends Fragment {
 
-    private ArrayList<Pair<Long, String>> mItemArray = new ArrayList<>();
+    public Map<Long, Priority> priorities = new HashMap<Long, Priority>();
+    public ArrayList<Pair<Long, String>> mItemArray = new ArrayList<>();
     private DragListView mDragListView;
     private PrioritySwipeRefreshLayout mRefreshLayout;
     public ItemAdapter listAdapter;
-    private long itemID = 4;
+    private long itemID = 0;
 
     public static ListFragment newInstance() {
         return new ListFragment();
@@ -44,9 +50,10 @@ public class ListFragment extends Fragment {
         setHasOptionsMenu(true);
     }
 
-    public void addItem(String item) {
+    public void addItem(String item, Priority priority) {
         itemID++;
         mItemArray.add(new Pair<>(itemID, item));
+        priorities.put(itemID, priority);
         listAdapter.notifyDataSetChanged();
     }
 
@@ -66,6 +73,7 @@ public class ListFragment extends Fragment {
             @Override
             public void onItemDragEnded(int fromPosition, int toPosition) {
                 mRefreshLayout.setEnabled(true);
+
                 if (fromPosition != toPosition) {
                     //Toast.makeText(mDragListView.getContext(), "End - position: " + toPosition, Toast.LENGTH_SHORT).show();
                 }
@@ -101,6 +109,7 @@ public class ListFragment extends Fragment {
                     Pair<Long, String> adapterItem = (Pair<Long, String>) item.getTag();
                     int pos = mDragListView.getAdapter().getPositionForItem(adapterItem);
                     mDragListView.getAdapter().removeItem(pos);
+                    mItemArray.remove(adapterItem);
                 }
             }
         });

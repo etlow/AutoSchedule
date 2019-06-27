@@ -8,6 +8,8 @@ import android.support.v7.app.AlertDialog;
 import android.widget.NumberPicker;
 import android.widget.TextView;
 
+import teamget.autoschedule.schedule.LunchBreakPriority;
+
 public class NumberPickerDialog extends DialogFragment {
     private NumberPicker.OnValueChangeListener valueChangeListener;
     private ListFragment lf;
@@ -31,7 +33,7 @@ public class NumberPickerDialog extends DialogFragment {
                         numberPicker.getValue(), numberPicker.getValue());
                 TextView text = (TextView) getActivity().findViewById(R.id.text_to_fill);
                 text.setText(String.format("I want a lunch break of at least %d hours.", numberPicker.getValue()));
-                lf.addItem((String) text.getText().toString());
+                lf.addItem((String) text.getText().toString(), new LunchBreakPriority(0, numberPicker.getValue()));
             }
         });
 
