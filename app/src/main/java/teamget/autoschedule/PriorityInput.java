@@ -19,6 +19,7 @@ import android.widget.TextView;
 import com.github.clans.fab.FloatingActionMenu;
 import com.github.clans.fab.FloatingActionButton;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -31,6 +32,7 @@ import teamget.autoschedule.schedule.MaxFreeDaysPriority;
 import teamget.autoschedule.schedule.MinimalBreaksPriority;
 import teamget.autoschedule.schedule.MinimalTravellingPriority;
 import teamget.autoschedule.schedule.Priority;
+import teamget.autoschedule.schedule.TypeAdapter;
 
 public class PriorityInput extends AppCompatActivity implements NumberPicker.OnValueChangeListener {
 
@@ -41,7 +43,9 @@ public class PriorityInput extends AppCompatActivity implements NumberPicker.OnV
                          minTravelling, minBreaks, lunchBreak;
 
     //List<Priority> priorities = new ArrayList<>();
-    final Gson gson = new Gson();
+    final Gson gson = new GsonBuilder()
+            .registerTypeAdapter(Priority.class, new TypeAdapter())
+            .create();
     SharedPreferences priorityPref;
     SharedPreferences.Editor spEditor;
 
@@ -169,7 +173,7 @@ public class PriorityInput extends AppCompatActivity implements NumberPicker.OnV
                     int rank = lf.listAdapter.getPositionForItem(p);
                     Priority priority = lf.priorities.get(p.first);
                     priority.setRank(rank);
-                    String json = gson.toJson(priority);
+                    String json = gson.toJson(priority, Priority.class);
                     newSet.add(json);
                 }
 

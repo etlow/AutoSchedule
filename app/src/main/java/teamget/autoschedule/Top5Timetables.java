@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.View;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +20,7 @@ import teamget.autoschedule.schedule.Priority;
 import teamget.autoschedule.schedule.Timetable;
 import teamget.autoschedule.schedule.TimetableGeneration;
 import teamget.autoschedule.schedule.TimetableScoring;
+import teamget.autoschedule.schedule.TypeAdapter;
 
 public class Top5Timetables extends AppCompatActivity {
     @Override
@@ -40,7 +42,9 @@ public class Top5Timetables extends AppCompatActivity {
         List<String> moduleJson = new ArrayList<String>(prioritySet);
         List<Priority> priorities = new ArrayList<>();
 
-        final Gson gson = new Gson();
+        final Gson gson = new GsonBuilder()
+                .registerTypeAdapter(Priority.class, new TypeAdapter())
+                .create();
         for (String s : moduleJson) {
             Priority p = gson.fromJson(s, Priority.class);
             priorities.add(p);
