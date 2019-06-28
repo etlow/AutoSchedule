@@ -5,7 +5,7 @@ import java.util.Comparator;
 import java.util.List;
 
 public class TimetableScoring {
-    static List<Priority> priorities;
+    private List<Priority> priorities;
 
     public TimetableScoring(List<Priority> priorities) {
         this.priorities = priorities;
@@ -29,7 +29,7 @@ public class TimetableScoring {
         }
     }
 
-    public static void getTimetableScore(Timetable t) {
+    public void getTimetableScore(Timetable t) {
         // get individual score from all priorities
         double timetableScore = 0;
         for (Priority p : priorities) {
@@ -38,7 +38,7 @@ public class TimetableScoring {
         t.setScore(timetableScore);
     }
 
-    public static void arrangeTimetablesByScore(List<Timetable> list) {
+    public void arrangeTimetablesByScore(List<Timetable> list) {
         // run once to get min+max distance and max free days
         findMinMaxValues(list);
 

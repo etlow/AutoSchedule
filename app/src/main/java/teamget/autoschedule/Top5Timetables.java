@@ -63,7 +63,7 @@ public class Top5Timetables extends AppCompatActivity {
         List<Timetable> timetables = tg.getListOfTimetables();
 
         // Calculate score, tag score, arrange in decreasing order
-        TimetableScoring.arrangeTimetablesByScore(timetables);
+        new TimetableScoring(priorities).arrangeTimetablesByScore(timetables);
 
         // Present top 5 timetables
         findViewById(R.id.buttonBasic).setOnClickListener(new View.OnClickListener() {
