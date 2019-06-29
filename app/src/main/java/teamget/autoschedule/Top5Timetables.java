@@ -69,7 +69,7 @@ public class Top5Timetables extends AppCompatActivity {
         findViewById(R.id.buttonBasic).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(Top5Timetables.this, NUSTimetableActivity.class);
+                Intent intent = new Intent(Top5Timetables.this, TimetableDaily.class);
                 startActivity(intent);
             }
         });

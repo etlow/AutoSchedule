@@ -19,6 +19,8 @@
     <string name="timetableviewer.toolbar.title">Timetable</string>
     <string name="timetableviewer.toolbar.done">Done</string>
 
+    <string name="timetabledaily.toolbar.title">Your daily schedule</string>
+
     <string name="action_today">Today</string>
     <string name="action_day_view">Day view</string>
     <string name="action_three_day_view">3 day view</string>
