@@ -2,20 +2,27 @@ package teamget.autoschedule;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayout;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import java.time.DayOfWeek;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import teamget.autoschedule.mods.Lesson;
 import teamget.autoschedule.mods.Module;
 import teamget.autoschedule.mods.SampleModules;
+import teamget.autoschedule.schedule.Event;
 import teamget.autoschedule.schedule.Priority;
 import teamget.autoschedule.schedule.Timetable;
 import teamget.autoschedule.schedule.TimetableGeneration;
@@ -73,6 +80,50 @@ public class Top5Timetables extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        GridLayout gridLayout = new GridLayout(getApplicationContext());
+        gridLayout.setColumnCount(12);
+        gridLayout.setRowCount(6);
+        gridLayout.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
+        gridLayout.setAlignmentMode(GridLayout.ALIGN_BOUNDS);
+        for (int i = 0; i < 11; i++) {
+            TextView textView = new TextView(getApplicationContext());
+            textView.setText(Integer.toString(i + 8));
+            GridLayout.LayoutParams params = new GridLayout.LayoutParams();
+            params.rowSpec = GridLayout.spec(0, 1);
+            params.columnSpec = GridLayout.spec(i + 1, 1, 1);
+            params.setGravity(Gravity.FILL_HORIZONTAL);
+            textView.setLayoutParams(params);
+            gridLayout.addView(textView);
+        }
+        DayOfWeek[] days = DayOfWeek.values();
+        for (int i = 0; i < 5; i++) {
+            TextView textView = new TextView(getApplicationContext());
+            textView.setText(days[i].name().substring(0, 3));
+            textView.setGravity(Gravity.CENTER);
+            GridLayout.LayoutParams params = new GridLayout.LayoutParams();
+            params.rowSpec = GridLayout.spec(i + 1, 1);
+            params.columnSpec = GridLayout.spec(0, 1);
+            params.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
+            textView.setLayoutParams(params);
+            gridLayout.addView(textView);
+        }
+        for (Event event : timetables.get(0).events) {
+            TextView textView = new TextView(getApplicationContext());
+            Lesson lesson = event.options.get(0).list.get(0);
+            textView.setText(lesson.moduleCode + "\n" + lesson.type.substring(0, 3) + "\n" + lesson.location.code);
+            textView.setTextSize(8);
+            textView.setGravity(Gravity.CENTER);
+            textView.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+            GridLayout.LayoutParams params = new GridLayout.LayoutParams();
+            params.rowSpec = GridLayout.spec(event.day + 1, 1);
+            params.columnSpec = GridLayout.spec(event.startHour - 7, event.endHour - event.startHour);
+            params.setGravity(Gravity.FILL_HORIZONTAL);
+            textView.setLayoutParams(params);
+            gridLayout.addView(textView);
+        }
+        LinearLayout linearLayout = findViewById(R.id.timetableTest);
+        linearLayout.addView(gridLayout);
 
         // Include option to open another 5
     }

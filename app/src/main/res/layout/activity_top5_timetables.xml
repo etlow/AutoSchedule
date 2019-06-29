@@ -46,4 +46,11 @@
         android:id="@+id/include2"
         layout="@layout/content_priority_input" />
 
+    <LinearLayout
+        android:id="@+id/timetableTest"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        app:layout_constraintTop_toBottomOf="@id/buttonBasic" />
+
 </android.support.constraint.ConstraintLayout>

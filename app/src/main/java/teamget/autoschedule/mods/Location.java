@@ -4,7 +4,7 @@ import android.support.annotation.NonNull;
 
 public class Location {
     private static double[][] distArr = {{0,457,520.9},{390.9,0,404.7},{503.2,471.5,0}};
-    private String code;
+    public String code;
     private int ref;
 
     public Location(String str) {
