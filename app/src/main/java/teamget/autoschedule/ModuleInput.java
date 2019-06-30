@@ -40,7 +40,7 @@ public class ModuleInput extends AppCompatActivity implements SearchView.OnQuery
 
         searchView = (SearchView) findViewById(R.id.module_searchview);
         listView = (ListView) findViewById(R.id.module_listview);
-        for (Module m : SampleModules.getModules()) { moduleList.add(m); }
+        for (Module m : SampleModules.getModules(getApplicationContext())) { moduleList.add(m); }
         adapter = new ArrayAdapter<Module>(this, android.R.layout.simple_list_item_1, moduleList);
         listView.setAdapter(adapter);
         searchView.setOnQueryTextListener(this);

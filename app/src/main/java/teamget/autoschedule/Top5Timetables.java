@@ -41,7 +41,7 @@ public class Top5Timetables extends AppCompatActivity {
         List<String> moduleCodes = new ArrayList<String>(moduleSet);
         List<Module> modules = new ArrayList<>();
         for (String s : moduleCodes) {
-            modules.add(SampleModules.getModuleByCode(s));
+            modules.add(SampleModules.getModuleByCode(s, getApplicationContext()));
         }
 
         SharedPreferences priorityPrefs = getSharedPreferences("PriorityPreferences", MODE_PRIVATE);

@@ -1,5 +1,7 @@
 package teamget.autoschedule.mods;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -14,28 +16,40 @@ import java.util.Map;
 import teamget.autoschedule.DownloadTask;
 
 public class SampleModules {
+    private static final String TAG = "SampleModules";
     private static SampleModules instance;
     private List<Module> modules = new ArrayList<>();
 
-    public static List<Module> getModules() {
+    public static List<Module> getModules(Context context) {
+        if (instance == null) {
+            instance = new SampleModules();
+            SharedPreferences modulesPref = context.getSharedPreferences(TAG, Context.MODE_PRIVATE);
+            for (Object data : modulesPref.getAll().values()) {
+                instance.createMod(data.toString());
+            }
+        }
         return instance.modules;
     }
 
-    public static void download() {
+    public static void download(Context context) {
         if (instance == null) {
             instance = new SampleModules();
-            instance.getModsTest("CS2030");
-            instance.getModsTest("CS2040");
-            instance.getModsTest("GER1000");
-            instance.getModsTest("GEQ1000");
+            instance.getModsTest("CS2030", context);
+            instance.getModsTest("CS2040", context);
+            instance.getModsTest("GER1000", context);
+            instance.getModsTest("GEQ1000", context);
         }
     }
 
-    private void getModsTest(String code) {
+    private void getModsTest(final String code, final Context context) {
         new DownloadTask(new DownloadTask.Callback() {
             @Override
             public void call(String result) {
-                Log.v("SampleModules", result);
+                Log.v(TAG, result);
+                SharedPreferences modulesPref = context.getSharedPreferences(TAG, Context.MODE_PRIVATE);
+                SharedPreferences.Editor modulesEditor = modulesPref.edit();
+                modulesEditor.putString(code, result);
+                modulesEditor.apply();
                 createMod(result);
             }
         }).execute("https://nusmods.com/api/v2/2018-2019/modules/" + code + ".json");
@@ -129,9 +143,9 @@ public class SampleModules {
         return list;
     }
 
-    public static Module getModuleByCode(String code) {
+    public static Module getModuleByCode(String code, Context context) {
         Module selected = null;
-        for (Module module : getModules()) {
+        for (Module module : getModules(context)) {
             if (module.getCode().equals(code)) {
                 selected = module;
             }

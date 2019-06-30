@@ -216,7 +216,7 @@ public class TimetableGeneration {
 
         List<Module> mods = new ArrayList<>();
         for (String modCode : modSet) {
-            mods.add(SampleModules.getModuleByCode(modCode));
+            mods.add(SampleModules.getModuleByCode(modCode, context));
         }
         sharedPref.edit().remove("modules").apply();
         return mods;
