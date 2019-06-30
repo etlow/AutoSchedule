@@ -34,23 +34,40 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <Button
-        android:id="@+id/buttonBasic"
-        style="@style/Button"
+    <LinearLayout
+        android:id="@+id/timetable0"
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:orientation="vertical"
+        app:layout_constraintTop_toBottomOf="@+id/appBarLayout3" />
+
+    <LinearLayout
+        android:id="@+id/timetable1"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:text="Timetable"
-        app:layout_constraintTop_toBottomOf="@+id/appBarLayout3" />
+        android:orientation="vertical"
+        app:layout_constraintTop_toBottomOf="@+id/timetable0" />
+    <LinearLayout
+        android:id="@+id/timetable2"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        app:layout_constraintTop_toBottomOf="@+id/timetable1" />
+    <LinearLayout
+        android:id="@+id/timetable3"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        app:layout_constraintTop_toBottomOf="@+id/timetable2" />
+    <LinearLayout
+        android:id="@+id/timetable4"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        app:layout_constraintTop_toBottomOf="@+id/timetable3" />
 
     <include
         android:id="@+id/include2"
         layout="@layout/content_priority_input" />
-
-    <LinearLayout
-        android:id="@+id/timetableTest"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:orientation="vertical"
-        app:layout_constraintTop_toBottomOf="@id/buttonBasic" />
 
 </android.support.constraint.ConstraintLayout>
