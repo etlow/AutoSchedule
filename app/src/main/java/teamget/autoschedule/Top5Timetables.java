@@ -131,6 +131,13 @@ public class Top5Timetables extends AppCompatActivity {
             layouts.get(grid).addView(gridLayout);
         }
 
+        getSharedPreferences("ChosenTimetable", MODE_PRIVATE)
+                .edit()
+                .putString("timetable", gson.toJson(timetables.get(0)))
+                .apply();
+        Intent intent = new Intent(this, ChosenTimetable.class);
+        startActivity(intent);
+
         // Include option to open another 5
     }
 

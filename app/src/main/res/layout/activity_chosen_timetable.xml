@@ -7,6 +7,7 @@
     tools:context=".ChosenTimetable">
 
     <android.support.design.widget.AppBarLayout
+        android:id="@+id/appBarLayout5"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:theme="@style/AppTheme.AppBarOverlay"
@@ -32,6 +33,15 @@
         </android.support.v7.widget.Toolbar>
 
     </android.support.design.widget.AppBarLayout>
+
+    <LinearLayout
+        android:id="@+id/chosenTimetableLinear"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginBottom="8dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="@+id/include"
+        app:layout_constraintTop_toBottomOf="@+id/appBarLayout5" />
 
     <include
         android:id="@+id/include"
