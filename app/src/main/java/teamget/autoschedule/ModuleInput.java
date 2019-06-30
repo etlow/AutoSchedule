@@ -1,7 +1,6 @@
 package teamget.autoschedule;
 
 import teamget.autoschedule.mods.*;
-import teamget.autoschedule.schedule.TimetableGeneration;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -26,8 +25,8 @@ public class ModuleInput extends AppCompatActivity implements SearchView.OnQuery
 
     ListView listView;
     SearchView searchView;
-    ArrayAdapter<Module> adapter;
-    ArrayList<Module> moduleList = new ArrayList<Module>();
+    ArrayAdapter<String> adapter;
+    ArrayList<String> moduleCodes;
     SharedPreferences modulePref;
     SharedPreferences.Editor spEditor;
 
@@ -40,8 +39,8 @@ public class ModuleInput extends AppCompatActivity implements SearchView.OnQuery
 
         searchView = (SearchView) findViewById(R.id.module_searchview);
         listView = (ListView) findViewById(R.id.module_listview);
-        for (Module m : SampleModules.getModules(getApplicationContext())) { moduleList.add(m); }
-        adapter = new ArrayAdapter<Module>(this, android.R.layout.simple_list_item_1, moduleList);
+        moduleCodes = new ArrayList<>(SampleModules.getModuleCodes(getApplicationContext()));
+        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, moduleCodes);
         listView.setAdapter(adapter);
         searchView.setOnQueryTextListener(this);
 
@@ -51,8 +50,8 @@ public class ModuleInput extends AppCompatActivity implements SearchView.OnQuery
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Module selectedModule = (Module) parent.getItemAtPosition(position);
-                String modCode = selectedModule.getCode();
+                String modCode = (String) parent.getItemAtPosition(position);
+                SampleModules.download(modCode, getApplicationContext());
 
                 Set<String> curr = modulePref.getStringSet("modules", Collections.<String>emptySet());
                 HashSet<String> newSet = new HashSet<>(curr);
@@ -90,7 +89,7 @@ public class ModuleInput extends AppCompatActivity implements SearchView.OnQuery
 
     @Override
     public boolean onQueryTextSubmit(String query) {
-        if (moduleList.contains(query)){
+        if (moduleCodes.contains(query)){
             adapter.getFilter().filter(query);
         } else {
             Snackbar.make(findViewById(android.R.id.content),

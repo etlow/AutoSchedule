@@ -18,27 +18,70 @@ import teamget.autoschedule.DownloadTask;
 public class SampleModules {
     private static final String TAG = "SampleModules";
     private static SampleModules instance;
+    private List<String> moduleCodes = new ArrayList<>();
     private List<Module> modules = new ArrayList<>();
 
-    public static List<Module> getModules(Context context) {
+    public static List<String> getModuleCodes(Context context) {
+        start(context);
+        return instance.moduleCodes;
+    }
+
+    public static Module getModuleByCode(String code, Context context) {
+        start(context);
+        Module selected = null;
+        for (Module module : instance.modules) {
+            if (module.getCode().equals(code)) {
+                selected = module;
+            }
+        }
+        return selected;
+    }
+
+    public static void download(Context context) {
+        if (instance == null) {
+            instance = new SampleModules();
+            instance.getModList(context);
+        }
+    }
+
+    private static void start(Context context) {
         if (instance == null) {
             instance = new SampleModules();
             SharedPreferences modulesPref = context.getSharedPreferences(TAG, Context.MODE_PRIVATE);
             for (Object data : modulesPref.getAll().values()) {
                 instance.createMod(data.toString());
             }
+            SharedPreferences listPref = context.getSharedPreferences("ModuleList", Context.MODE_PRIVATE);
+            instance.createModList(listPref.getString("list", null));
         }
-        return instance.modules;
     }
 
-    public static void download(Context context) {
-        if (instance == null) {
-            instance = new SampleModules();
-            instance.getModsTest("CS2030", context);
-            instance.getModsTest("CS2040", context);
-            instance.getModsTest("GER1000", context);
-            instance.getModsTest("GEQ1000", context);
+    public static void download(String code, Context context) {
+        start(context);
+        if (!exists(code, instance.modules)) {
+            instance.getModsTest(code, context);
         }
+    }
+
+    private static boolean exists(String code, List<Module> modules) {
+        for (Module module : modules) {
+            if (module.getCode().equals(code)) return true;
+        }
+        return false;
+    }
+
+    private void getModList(final Context context) {
+        new DownloadTask(new DownloadTask.Callback() {
+            @Override
+            public void call(String result) {
+                Log.v(TAG, result);
+                SharedPreferences modulesPref = context.getSharedPreferences("ModuleList", Context.MODE_PRIVATE);
+                SharedPreferences.Editor modulesEditor = modulesPref.edit();
+                modulesEditor.putString("list", result);
+                modulesEditor.apply();
+                createModList(result);
+            }
+        }).execute("https://nusmods.com/api/v2/2018-2019/moduleList.json");
     }
 
     private void getModsTest(final String code, final Context context) {
@@ -53,6 +96,17 @@ public class SampleModules {
                 createMod(result);
             }
         }).execute("https://nusmods.com/api/v2/2018-2019/modules/" + code + ".json");
+    }
+
+    private void createModList(String result) {
+        try {
+            JSONArray jArr = new JSONArray(result);
+            for (int i = 0; i < jArr.length(); i++) {
+                moduleCodes.add(jArr.getJSONObject(i).getString("moduleCode"));
+            }
+        } catch (JSONException e) {
+            Log.v("SampleModules", e.getMessage());
+        }
     }
 
     private void createMod(String result) {
@@ -141,15 +195,5 @@ public class SampleModules {
             list.add(new ArrayList<>(optMap.values()));
         }
         return list;
-    }
-
-    public static Module getModuleByCode(String code, Context context) {
-        Module selected = null;
-        for (Module module : getModules(context)) {
-            if (module.getCode().equals(code)) {
-                selected = module;
-            }
-        }
-        return selected;
     }
 }
