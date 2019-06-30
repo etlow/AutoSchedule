@@ -8,6 +8,7 @@ import android.support.v7.widget.GridLayout;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -30,10 +31,19 @@ import teamget.autoschedule.schedule.TimetableScoring;
 import teamget.autoschedule.schedule.TypeAdapter;
 
 public class Top5Timetables extends AppCompatActivity {
+    Button select0, select1, select2, select3, select4;
+    int selectedTimetable;
+    List<Timetable> timetables;
+
+//    SharedPreferences timetablePref;
+//    SharedPreferences.Editor spEditor;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_top5_timetables);
+//        timetablePref = getApplicationContext().getSharedPreferences("TimetablePreferences", MODE_PRIVATE);
+//        spEditor = timetablePref.edit();
 
         // Receive SP for modules and priorities
         SharedPreferences modulePrefs = getSharedPreferences("ModulePreferences", MODE_PRIVATE);
@@ -67,7 +77,7 @@ public class Top5Timetables extends AppCompatActivity {
         // Generate list of timetables
         TimetableGeneration tg = new TimetableGeneration();
         tg.setModules(modules);
-        List<Timetable> timetables = tg.getListOfTimetables();
+        timetables = tg.getListOfTimetables();
 
         // Calculate score, tag score, arrange in decreasing order
         new TimetableScoring(priorities).arrangeTimetablesByScore(timetables);
@@ -131,15 +141,41 @@ public class Top5Timetables extends AppCompatActivity {
             layouts.get(grid).addView(gridLayout);
         }
 
-        getSharedPreferences("ChosenTimetable", MODE_PRIVATE)
-                .edit()
-                .putString("timetable", gson.toJson(timetables.get(0)))
-                .apply();
-        Intent intent = new Intent(this, ChosenTimetable.class);
-        startActivity(intent);
+        select0 = (Button) findViewById(R.id.button0);
+        select1 = (Button) findViewById(R.id.button1);
+        select2 = (Button) findViewById(R.id.button2);
+        select3 = (Button) findViewById(R.id.button3);
+        select4 = (Button) findViewById(R.id.button4);
 
         // Include option to open another 5
     }
 
-    // OnClick: Choose timetable -> TimetableViewer activity
+    public void onButtonClick(View v) {
+        switch(v.getId()) {
+            case R.id.button0:
+                selectedTimetable = 0;
+                break;
+            case R.id.button1:
+                selectedTimetable = 1;
+                break;
+            case R.id.button2:
+                selectedTimetable = 2;
+                break;
+            case R.id.button3:
+                selectedTimetable = 3;
+                break;
+            case R.id.button4:
+                selectedTimetable = 4;
+        }
+
+        final Gson gson = new GsonBuilder()
+                .registerTypeAdapter(Timetable.class, new TypeAdapter())
+                .create();
+        getSharedPreferences("ChosenTimetable", MODE_PRIVATE)
+                .edit()
+                .putString("timetable", gson.toJson(timetables.get(selectedTimetable)))
+                .apply();
+        Intent intent = new Intent(this, ChosenTimetable.class);
+        startActivity(intent);
+    }
 }
