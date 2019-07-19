@@ -14,7 +14,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        SampleModules.download(getApplicationContext());
+        // Should go in semester selection activity
+        SampleModules.downloadModules("2018-2019", getApplicationContext());
     }
 
     public void onButtonClick(View v) {

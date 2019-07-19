@@ -47,11 +47,12 @@ public class Top5Timetables extends AppCompatActivity {
 
         // Receive SP for modules and priorities
         SharedPreferences modulePrefs = getSharedPreferences("ModulePreferences", MODE_PRIVATE);
+        int semester = modulePrefs.getInt("semester", 0);
         Set<String> moduleSet = modulePrefs.getStringSet("modules", null);
         List<String> moduleCodes = new ArrayList<String>(moduleSet);
         List<Module> modules = new ArrayList<>();
         for (String s : moduleCodes) {
-            modules.add(SampleModules.getModuleByCode(s, getApplicationContext()));
+            modules.add(SampleModules.getModuleByCode(semester, s, getApplicationContext()));
         }
 
         SharedPreferences priorityPrefs = getSharedPreferences("PriorityPreferences", MODE_PRIVATE);

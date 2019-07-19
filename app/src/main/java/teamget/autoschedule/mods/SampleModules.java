@@ -18,41 +18,57 @@ import teamget.autoschedule.DownloadTask;
 public class SampleModules {
     private static final String TAG = "SampleModules";
     private static SampleModules instance;
-    private List<String> moduleCodes = new ArrayList<>();
+    private String currentYear;
+    private int currentSem;
+    private List<String> moduleCodes;
     private List<Module> modules = new ArrayList<>();
+    private JSONArray modulesJSON;
 
     public static List<String> getModuleCodes(Context context) {
         start(context);
         return instance.moduleCodes;
     }
 
-    public static Module getModuleByCode(String code, Context context) {
+    public static List<Integer> getModuleSemesters(String code, Context context) {
         start(context);
-        Module selected = null;
+        List<Integer> semesters = new ArrayList<>();
+        JSONArray modules = instance.modulesJSON;
+        for (int i = 0; i < modules.length(); i++) {
+            try {
+                JSONObject module = modules.getJSONObject(i);
+                if (module.getString("moduleCode").equals(code)) {
+                    JSONArray semestersJSON = module.getJSONArray("semesters");
+                    for (int j = 0; j < semestersJSON.length(); j++) {
+                        semesters.add(semestersJSON.getInt(j));
+                    }
+                    return semesters;
+                }
+            } catch (JSONException e) {
+                Log.v("SampleModules", e.getMessage());
+            }
+        }
+        return semesters;
+    }
+
+    public static Module getModuleByCode(int semester, String code, Context context) {
+        start(context);
+        if (semester != instance.currentSem) {
+            instance.currentSem = semester;
+            instance.modules = new ArrayList<>();
+        }
         for (Module module : instance.modules) {
             if (module.getCode().equals(code)) {
-                selected = module;
+                return module;
             }
         }
-        return selected;
+        return startMod(code, context);
     }
 
-    public static void download(Context context) {
-        if (instance == null) {
+    public static void downloadModules(String year, Context context) {
+        if (instance == null || !year.equals(instance.currentYear)) {
             instance = new SampleModules();
+            instance.currentYear = year;
             instance.getModList(context);
-        }
-    }
-
-    private static void start(Context context) {
-        if (instance == null) {
-            instance = new SampleModules();
-            SharedPreferences modulesPref = context.getSharedPreferences(TAG, Context.MODE_PRIVATE);
-            for (Object data : modulesPref.getAll().values()) {
-                instance.createMod(data.toString());
-            }
-            SharedPreferences listPref = context.getSharedPreferences("ModuleList", Context.MODE_PRIVATE);
-            instance.createModList(listPref.getString("list", null));
         }
     }
 
@@ -61,6 +77,21 @@ public class SampleModules {
         if (!exists(code, instance.modules)) {
             instance.getModsTest(code, context);
         }
+    }
+
+    private static void start(Context context) {
+        if (instance == null) {
+            instance = new SampleModules();
+            SharedPreferences listPref = context.getSharedPreferences("ModuleList", Context.MODE_PRIVATE);
+            instance.moduleCodes = instance.createModList(listPref.getString("list", null));
+        }
+    }
+
+    private static Module startMod(String code, Context context) {
+        SharedPreferences modulesPref = context.getSharedPreferences(TAG, Context.MODE_PRIVATE);
+        Module module = instance.createMod(modulesPref.getString(code, null));
+        instance.modules.add(module);
+        return module;
     }
 
     private static boolean exists(String code, List<Module> modules) {
@@ -77,8 +108,8 @@ public class SampleModules {
             SharedPreferences.Editor modulesEditor = modulesPref.edit();
             modulesEditor.putString("list", result);
             modulesEditor.apply();
-            createModList(result);
-        }).execute("https://nusmods.com/api/v2/2018-2019/moduleList.json");
+            moduleCodes = createModList(result);
+        }).execute("https://nusmods.com/api/v2/" + currentYear + "/moduleList.json");
     }
 
     private void getModsTest(final String code, final Context context) {
@@ -88,37 +119,44 @@ public class SampleModules {
             SharedPreferences.Editor modulesEditor = modulesPref.edit();
             modulesEditor.putString(code, result);
             modulesEditor.apply();
-            createMod(result);
-        }).execute("https://nusmods.com/api/v2/2018-2019/modules/" + code + ".json");
+            modules.add(createMod(result));
+        }).execute("https://nusmods.com/api/v2/" + currentYear + "/modules/" + code + ".json");
     }
 
-    private void createModList(String result) {
+    private List<String> createModList(String result) {
+        List<String> codes = new ArrayList<>();
         try {
-            JSONArray jArr = new JSONArray(result);
-            for (int i = 0; i < jArr.length(); i++) {
-                moduleCodes.add(jArr.getJSONObject(i).getString("moduleCode"));
+            modulesJSON = new JSONArray(result);
+            for (int i = 0; i < modulesJSON.length(); i++) {
+                codes.add(modulesJSON.getJSONObject(i).getString("moduleCode"));
             }
         } catch (JSONException e) {
             Log.v("SampleModules", e.getMessage());
         }
+        return codes;
     }
 
-    private void createMod(String result) {
+    private Module createMod(String result) {
+        Module module = null;
         try {
             JSONObject jObj = new JSONObject(result);
             String moduleCode = jObj.getString("moduleCode");
-            JSONArray opts = jObj
-                    .getJSONArray("semesterData")
-                    .getJSONObject(1)
-                    .getJSONArray("timetable");
-            Map<String, Map<String, Option>> map = new HashMap<>();
-            for (int i = 0; i < opts.length(); i++) {
-                insertOption(map, opts.getJSONObject(i), moduleCode);
+            JSONArray semesterData = jObj.getJSONArray("semesterData");
+            for (int i = 0; i < semesterData.length(); i++) {
+                JSONObject semInfo = semesterData.getJSONObject(i);
+                if (semInfo.getInt("semester") == currentSem) {
+                    JSONArray opts = semInfo.getJSONArray("timetable");
+                    Map<String, Map<String, Option>> map = new HashMap<>();
+                    for (int j = 0; j < opts.length(); j++) {
+                        insertOption(map, opts.getJSONObject(j), moduleCode);
+                    }
+                    module = new Module(moduleCode, toList(map));
+                }
             }
-            modules.add(new Module(moduleCode, toList(map)));
         } catch (JSONException e) {
             Log.v("SampleModules", e.getMessage());
         }
+        return module;
     }
 
     private void insertOption(Map<String, Map<String, Option>> map, JSONObject opt, String moduleCode)
@@ -157,7 +195,7 @@ public class SampleModules {
         if (options.containsKey(classNo)) {
             option = options.get(classNo);
         } else {
-            option = new Option(moduleCode, new ArrayList<Lesson>());
+            option = new Option(moduleCode, new ArrayList<>());
             options.put(classNo, option);
         }
         assert option != null;

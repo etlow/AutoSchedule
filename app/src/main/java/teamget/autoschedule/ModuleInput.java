@@ -19,6 +19,7 @@ import android.widget.SearchView;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class ModuleInput extends AppCompatActivity implements SearchView.OnQueryTextListener {
@@ -47,10 +48,25 @@ public class ModuleInput extends AppCompatActivity implements SearchView.OnQuery
         modulePref = getApplicationContext().getSharedPreferences("ModulePreferences", MODE_PRIVATE);
         spEditor = modulePref.edit();
 
+        // Should go in semester selection activity
+        spEditor.putString("year", "2018-2019");
+        spEditor.putInt("semester", 2);
+        spEditor.apply();
+
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String modCode = (String) parent.getItemAtPosition(position);
+                List<Integer> semesters =
+                        SampleModules.getModuleSemesters(modCode, getApplicationContext());
+                Integer currSem = modulePref.getInt("semester", 0);
+                if (!semesters.contains(currSem)) {
+                    Snackbar.make(findViewById(android.R.id.content),
+                            modCode + " is unavailable in the current semester.",
+                            Snackbar.LENGTH_LONG).show();
+                    return;
+                }
+
                 SampleModules.download(modCode, getApplicationContext());
 
                 Set<String> curr = modulePref.getStringSet("modules", Collections.<String>emptySet());

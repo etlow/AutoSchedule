@@ -212,11 +212,12 @@ public class TimetableGeneration {
     private static List<Module> getAndClearModules(Context context) {
         SharedPreferences sharedPref = context.getSharedPreferences(
                 "ModulePreferences", Context.MODE_PRIVATE);
+        int semester = sharedPref.getInt("semester", 0);
         Set<String> modSet = sharedPref.getStringSet("modules", Collections.<String>emptySet());
 
         List<Module> mods = new ArrayList<>();
         for (String modCode : modSet) {
-            mods.add(SampleModules.getModuleByCode(modCode, context));
+            mods.add(SampleModules.getModuleByCode(semester, modCode, context));
         }
         sharedPref.edit().remove("modules").apply();
         return mods;
