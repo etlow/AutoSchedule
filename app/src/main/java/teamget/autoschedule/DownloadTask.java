@@ -1,6 +1,10 @@
 package teamget.autoschedule;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
+import android.support.v4.util.Consumer;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,14 +18,15 @@ import javax.net.ssl.HttpsURLConnection;
  */
 public class DownloadTask extends AsyncTask<String, Integer, DownloadTask.Result> {
 
-    private Callback callback;
+    private ConnectivityManager connectivityManager;
+    private Consumer<Exception> onException;
+    private Consumer<String> callback;
 
-    public DownloadTask(Callback c) {
+    public DownloadTask(Context context, Consumer<Exception> ex, Consumer<String> c) {
+        connectivityManager = (ConnectivityManager)
+                context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        onException = ex;
         callback = c;
-    }
-
-    public interface Callback {
-        void call(String result);
     }
 
     // private DownloadCallback<String> callback;
@@ -55,16 +60,16 @@ public class DownloadTask extends AsyncTask<String, Integer, DownloadTask.Result
      */
     @Override
     protected void onPreExecute() {
-    //     if (callback != null) {
-    //         NetworkInfo networkInfo = callback.getActiveNetworkInfo();
-    //         if (networkInfo == null || !networkInfo.isConnected() ||
-    //                 (networkInfo.getType() != ConnectivityManager.TYPE_WIFI
-    //                         && networkInfo.getType() != ConnectivityManager.TYPE_MOBILE)) {
-    //             // If no connectivity, cancel task and update Callback with null data.
-    //             callback.updateFromDownload(null);
-    //             cancel(true);
-    //         }
-    //     }
+        if (callback != null && connectivityManager != null) {
+            NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+            if (networkInfo == null || !networkInfo.isConnected() ||
+                    (networkInfo.getType() != ConnectivityManager.TYPE_WIFI
+                            && networkInfo.getType() != ConnectivityManager.TYPE_MOBILE)) {
+                // If no connectivity, cancel task and update Callback with null data.
+                // callback.updateFromDownload(null);
+                cancel(true);
+            }
+        }
     }
 
     /**
@@ -97,11 +102,9 @@ public class DownloadTask extends AsyncTask<String, Integer, DownloadTask.Result
     protected void onPostExecute(Result result) {
         if (result != null && callback != null) {
             if (result.exception != null) {
-                // callback.updateFromDownload(result.exception.getMessage());
-                callback.call(result.exception.getMessage());
+                onException.accept(result.exception);
             } else if (result.resultValue != null) {
-                // callback.updateFromDownload(result.resultValue);
-                callback.call(result.resultValue);
+                callback.accept(result.resultValue);
             }
             // callback.finishDownloading();
         }

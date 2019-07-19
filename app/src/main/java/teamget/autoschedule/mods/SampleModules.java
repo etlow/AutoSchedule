@@ -71,30 +71,24 @@ public class SampleModules {
     }
 
     private void getModList(final Context context) {
-        new DownloadTask(new DownloadTask.Callback() {
-            @Override
-            public void call(String result) {
-                Log.v(TAG, result);
-                SharedPreferences modulesPref = context.getSharedPreferences("ModuleList", Context.MODE_PRIVATE);
-                SharedPreferences.Editor modulesEditor = modulesPref.edit();
-                modulesEditor.putString("list", result);
-                modulesEditor.apply();
-                createModList(result);
-            }
+        new DownloadTask(context, ex -> Log.v(TAG, ex.toString()), result -> {
+            Log.v(TAG, result.substring(0, 300));
+            SharedPreferences modulesPref = context.getSharedPreferences("ModuleList", Context.MODE_PRIVATE);
+            SharedPreferences.Editor modulesEditor = modulesPref.edit();
+            modulesEditor.putString("list", result);
+            modulesEditor.apply();
+            createModList(result);
         }).execute("https://nusmods.com/api/v2/2018-2019/moduleList.json");
     }
 
     private void getModsTest(final String code, final Context context) {
-        new DownloadTask(new DownloadTask.Callback() {
-            @Override
-            public void call(String result) {
-                Log.v(TAG, result);
-                SharedPreferences modulesPref = context.getSharedPreferences(TAG, Context.MODE_PRIVATE);
-                SharedPreferences.Editor modulesEditor = modulesPref.edit();
-                modulesEditor.putString(code, result);
-                modulesEditor.apply();
-                createMod(result);
-            }
+        new DownloadTask(context, ex -> Log.v(TAG, ex.toString()), result -> {
+            Log.v(TAG, result.substring(0, 1000));
+            SharedPreferences modulesPref = context.getSharedPreferences(TAG, Context.MODE_PRIVATE);
+            SharedPreferences.Editor modulesEditor = modulesPref.edit();
+            modulesEditor.putString(code, result);
+            modulesEditor.apply();
+            createMod(result);
         }).execute("https://nusmods.com/api/v2/2018-2019/modules/" + code + ".json");
     }
 
