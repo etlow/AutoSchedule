@@ -169,9 +169,7 @@ public class Top5Timetables extends AppCompatActivity {
                 selectedTimetable = 4;
         }
 
-        final Gson gson = new GsonBuilder()
-                .registerTypeAdapter(Timetable.class, new TypeAdapter())
-                .create();
+        final Gson gson = new Gson();
         getSharedPreferences("ChosenTimetable", MODE_PRIVATE)
                 .edit()
                 .putString("timetable", gson.toJson(timetables.get(selectedTimetable)))
