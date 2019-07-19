@@ -62,6 +62,7 @@ public class MinimalTravellingPriority extends Priority {
 
     @Override
     public double getScoreMultiplier(Timetable t) {
+        if (maxPossibleDist - minPossibleDist < 1) return 1;
         double multiplier = (maxPossibleDist - findDistance(t)) / (maxPossibleDist - minPossibleDist);
         return multiplier;
     }
