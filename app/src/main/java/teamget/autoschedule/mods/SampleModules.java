@@ -103,7 +103,7 @@ public class SampleModules {
 
     private void getModList(final Context context) {
         new DownloadTask(context, ex -> Log.v(TAG, ex.toString()), result -> {
-            Log.v(TAG, result.substring(0, 300));
+            Log.v(TAG, result.substring(0, 300).replace('\n', '|'));
             SharedPreferences modulesPref = context.getSharedPreferences("ModuleList", Context.MODE_PRIVATE);
             SharedPreferences.Editor modulesEditor = modulesPref.edit();
             modulesEditor.putString("list", result);
@@ -114,12 +114,11 @@ public class SampleModules {
 
     private void getModsTest(final String code, final Context context) {
         new DownloadTask(context, ex -> Log.v(TAG, ex.toString()), result -> {
-            Log.v(TAG, result.substring(0, 1000));
+            Log.v(TAG, result.substring(0, 1000).replace('\n', '|'));
             SharedPreferences modulesPref = context.getSharedPreferences(TAG, Context.MODE_PRIVATE);
             SharedPreferences.Editor modulesEditor = modulesPref.edit();
             modulesEditor.putString(code, result);
             modulesEditor.apply();
-            modules.add(createMod(result));
         }).execute("https://nusmods.com/api/v2/" + currentYear + "/modules/" + code + ".json");
     }
 
@@ -156,6 +155,7 @@ public class SampleModules {
         } catch (JSONException e) {
             Log.v("SampleModules", e.getMessage());
         }
+        if (module == null) Log.w("SampleModules", "createMod returning null");
         return module;
     }
 
