@@ -5,6 +5,10 @@
     <string name="main.msg.welcome">Welcome to AutoSchedule!</string>
     <string name="main.button.start">Let\'s Get Started</string>
 
+    <string name="semesterselection.msg.year">Please select the academic year:</string>
+    <string name="semesterselection.msg.semester">Please select the semester:</string>
+    <string name="semesterselection.button.selectmodules">Select modules</string>
+
     <string name="moduleinput.toolbar.title">Add your modules</string>
     <string name="moduleinput.toolbar.done">Done</string>
     <string name="moduleinput.hint.search">Search for module...</string>

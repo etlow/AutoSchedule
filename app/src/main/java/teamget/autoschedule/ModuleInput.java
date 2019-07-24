@@ -38,20 +38,15 @@ public class ModuleInput extends AppCompatActivity implements SearchView.OnQuery
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        modulePref = getApplicationContext().getSharedPreferences("ModulePreferences", MODE_PRIVATE);
+        spEditor = modulePref.edit();
+
         searchView = (SearchView) findViewById(R.id.module_searchview);
         listView = (ListView) findViewById(R.id.module_listview);
         moduleCodes = new ArrayList<>(SampleModules.getModuleCodes(getApplicationContext()));
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, moduleCodes);
         listView.setAdapter(adapter);
         searchView.setOnQueryTextListener(this);
-
-        modulePref = getApplicationContext().getSharedPreferences("ModulePreferences", MODE_PRIVATE);
-        spEditor = modulePref.edit();
-
-        // Should go in semester selection activity
-        spEditor.putString("year", "2018-2019");
-        spEditor.putInt("semester", 2);
-        spEditor.apply();
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override

@@ -1,10 +1,14 @@
 package teamget.autoschedule;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayout;
+import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -22,6 +26,8 @@ public class ChosenTimetable extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chosen_timetable);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
         SharedPreferences pref = getSharedPreferences("ChosenTimetable", MODE_PRIVATE);
         String timetableStr = pref.getString("timetable", null);
@@ -67,5 +73,38 @@ public class ChosenTimetable extends AppCompatActivity {
         }
         LinearLayout linearLayout = findViewById(R.id.chosenTimetableLinear);
         linearLayout.addView(gridLayout);
+    }
+
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.chosen_timetable_action_bar, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_add_events:
+                // Add ad-hoc events
+                return true;
+
+            case R.id.action_edit_modules:
+                Intent intent = new Intent(this, ModuleInput.class);
+                startActivity(intent);
+                return true;
+
+            case R.id.action_edit_priorities:
+                intent = new Intent(this, PriorityInput.class);
+                startActivity(intent);
+                return true;
+
+            case R.id.action_choose_other_timetable:
+                intent = new Intent(this, Top5Timetables.class);
+                startActivity(intent);
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+
+        }
     }
 }

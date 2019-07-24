@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_add_events"
+        android:icon="@drawable/ic_plus_24px"
+        android:title="Add event"
+        app:showAsAction="always"/>
+    <item
+        android:id="@+id/empty"
+        android:title="Edit more..."
+        android:orderInCategory="101"
+        app:showAsAction="always"
+        android:icon="@drawable/ic_baseline_more_vert_24px">
+
+        <menu>
+
+            <item android:id="@+id/action_edit_modules"
+                android:icon="@drawable/ic_book_open_variant"
+                app:showAsAction="ifRoom"
+                android:title="Edit modules" />
+
+            <item android:id="@+id/action_edit_priorities"
+                android:icon="@drawable/ic_format_list_numbered"
+                app:showAsAction="ifRoom"
+                android:title="Edit priorities" />
+
+            <item android:id="@+id/action_choose_other_timetable"
+                android:icon="@drawable/ic_timetable"
+                app:showAsAction="ifRoom"
+                android:title="Choose other timetable" />
+
+        </menu>
+
+    </item>
+</menu>
