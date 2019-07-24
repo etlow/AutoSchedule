@@ -1,11 +1,9 @@
 package teamget.autoschedule;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-
-import teamget.autoschedule.mods.SampleModules;
 
 public class MainActivity extends AppCompatActivity {
     // First launch welcome screen

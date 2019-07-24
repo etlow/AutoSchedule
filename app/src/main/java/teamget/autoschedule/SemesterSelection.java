@@ -21,18 +21,18 @@ public class SemesterSelection extends AppCompatActivity implements AdapterView.
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_semester_selection);
 
-        pref = getApplicationContext().getSharedPreferences("SemesterPreferences", MODE_PRIVATE);
+        pref = getApplicationContext().getSharedPreferences("ModulePreferences", MODE_PRIVATE);
         editor = pref.edit();
 
         year = findViewById(R.id.yearspinner);
-        String[] years = new String[]{"2017-2018", "2018-2019", "2019-2020"};
+        String[] years = new String[]{"2018-2019", "2019-2020"};
         ArrayAdapter<String> yearAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, years);
         yearAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         year.setAdapter(yearAdapter);
         year.setOnItemSelectedListener(this);
 
         semester = findViewById(R.id.semesterspinner);
-        String[] semesters = new String[]{"Semester 1", "Semester 2", "Special Term"};
+        String[] semesters = new String[]{"Semester 1", "Semester 2", "Special Term I", "Special Term II"};
         ArrayAdapter<String> semesterAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, semesters);
         semesterAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         semester.setAdapter(semesterAdapter);
@@ -40,8 +40,11 @@ public class SemesterSelection extends AppCompatActivity implements AdapterView.
     }
 
     @Override
-    public void onItemSelected(AdapterView<?> parent, View view, int pos,long id) {
-        // nothing
+    public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
+        if (parent == year) {
+            String acadYear = parent.getItemAtPosition(pos).toString();
+            SampleModules.downloadModules(acadYear, getApplicationContext());
+        }
     }
 
     @Override
@@ -61,11 +64,14 @@ public class SemesterSelection extends AppCompatActivity implements AdapterView.
             case "Semester 2":
                 acadSemID = 2;
                 break;
-            case "Special Term":
+            case "Special Term I":
                 acadSemID = 3;
+                break;
+            case "Special Term II":
+                acadSemID = 4;
+                break;
         }
 
-        SampleModules.downloadModules(acadYear, getApplicationContext());
         editor.putString("year", acadYear);
         editor.putInt("semester", acadSemID);
         editor.apply();
