@@ -17,11 +17,13 @@ import com.google.gson.GsonBuilder;
 
 import java.time.DayOfWeek;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
 import teamget.autoschedule.mods.Lesson;
 import teamget.autoschedule.mods.Module;
+import teamget.autoschedule.mods.Option;
 import teamget.autoschedule.mods.SampleModules;
 import teamget.autoschedule.schedule.Event;
 import teamget.autoschedule.schedule.Priority;
@@ -34,6 +36,8 @@ public class Top5Timetables extends AppCompatActivity {
     Button select0, select1, select2, select3, select4;
     int selectedTimetable;
     List<Timetable> timetables;
+
+    private static final int NUM_CONSIDER = 10;
 
 //    SharedPreferences timetablePref;
 //    SharedPreferences.Editor spEditor;
@@ -75,10 +79,46 @@ public class Top5Timetables extends AppCompatActivity {
             Log.d("module check", "module: " + s);
         }
 
-        // Generate list of timetables
-        TimetableGeneration tg = new TimetableGeneration();
-        tg.setModules(modules);
-        timetables = tg.getListOfTimetables();
+        List<List<List<Event>>> itemsForScheduling = new ArrayList<>();
+        for (Module module : modules) {
+            for (List<Option> options : module.list) {
+                itemsForScheduling.add(TimetableGeneration.toEventList(options));
+            }
+        }
+
+        Collections.sort(itemsForScheduling, (opts, other) -> opts.size() - other.size());
+
+        List<List<List<Event>>> firstList = new ArrayList<>();
+        List<List<List<Event>>> secondList = new ArrayList<>();
+        int firstSpace = 1;
+        int secondSpace = 1;
+        while (!itemsForScheduling.isEmpty()) {
+            if (firstSpace > secondSpace) {
+                List<List<Event>> item = itemsForScheduling.remove(itemsForScheduling.size() - 1);
+                secondList.add(item);
+                secondSpace *= item.size();
+            } else {
+                List<List<Event>> item = itemsForScheduling.remove(0);
+                firstList.add(item);
+                firstSpace *= item.size();
+            }
+        }
+        Log.v("space", "First: " + firstSpace + ", Second: " + secondSpace);
+
+        // First stage list of timetables
+        TimetableGeneration tg1 = new TimetableGeneration();
+        tg1.setEvents(Collections.emptyList(), firstList);
+        List<Timetable> firstStage = tg1.getListOfTimetables();
+
+        // Calculate score, tag score, arrange in decreasing order
+        new TimetableScoring(priorities).arrangeTimetablesByScore(firstStage);
+
+        timetables = new ArrayList<>();
+        for (int i = 0; i < firstStage.size() && i < NUM_CONSIDER; i++) {
+            TimetableGeneration tg2 = new TimetableGeneration();
+            tg2.setEvents(firstStage.get(i).events, secondList);
+            timetables.addAll(tg2.getListOfTimetables());
+        }
 
         // Calculate score, tag score, arrange in decreasing order
         new TimetableScoring(priorities).arrangeTimetablesByScore(timetables);

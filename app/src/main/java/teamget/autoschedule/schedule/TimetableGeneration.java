@@ -8,7 +8,6 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
@@ -39,15 +38,10 @@ public class TimetableGeneration {
                 toBeScheduled[nextPos++] = toEventArr(list.get(j));
             }
         }
-        Arrays.sort(toBeScheduled, new Comparator<Event[][]>() {
-            @Override
-            public int compare(Event[][] events, Event[][] t1) {
-                return events.length - t1.length;
-            }
-        });
+        Arrays.sort(toBeScheduled, (events, t1) -> events.length - t1.length);
     }
 
-    private void setEvents(List<Event> fixed, List<List<List<Event>>> options) {
+    public void setEvents(List<Event> fixed, List<List<List<Event>>> options) {
         List<List<List<Event>>> reqList = new ArrayList<>(options);
         reqList.add(Collections.singletonList(fixed));
         numEvents = reqList.size();
@@ -64,12 +58,7 @@ public class TimetableGeneration {
                 eventsArr[j] = addToArr(new Event[eventList.size()], eventList);
             }
         }
-        Arrays.sort(toBeScheduled, new Comparator<Event[][]>() {
-            @Override
-            public int compare(Event[][] events, Event[][] t1) {
-                return events.length - t1.length;
-            }
-        });
+        Arrays.sort(toBeScheduled, (events, t1) -> events.length - t1.length);
     }
 
     public Timetable getTimetable() {
@@ -83,7 +72,6 @@ public class TimetableGeneration {
 
     public List<Timetable> getListOfTimetables() {
         List<Timetable> list = new ArrayList<>();
-        list.add(getTimetable());
         while (next()) {
             list.add(getTimetable());
         }
@@ -116,6 +104,27 @@ public class TimetableGeneration {
             events.add(eventArr);
         }
         return addToArr(new Event[events.size()][], events);
+    }
+
+    public static List<List<Event>> toEventList(List<Option> opts) {
+        List<List<Event>> events = new ArrayList<>();
+        List<Option> options = new ArrayList<>(opts);
+        while (!options.isEmpty()) {
+            Option option = options.remove(options.size() - 1);
+            List<Option> sameTimeOptions = new ArrayList<>();
+            sameTimeOptions.add(option);
+            for (int k = options.size() - 1; k >= 0; k--) {
+                if (sameTime(option, options.get(k))) {
+                    sameTimeOptions.add(options.remove(k));
+                }
+            }
+            List<Event> eventList = new ArrayList<>();
+            for (int i = 0; i < option.list.size(); i++) {
+                eventList.add(new Event(option.list.get(i), sameTimeOptions));
+            }
+            events.add(eventList);
+        }
+        return events;
     }
 
     private static boolean sameTime(Option a, Option b) {
