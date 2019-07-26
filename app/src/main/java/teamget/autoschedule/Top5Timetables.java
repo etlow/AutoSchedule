@@ -93,7 +93,8 @@ public class Top5Timetables extends AppCompatActivity {
         int firstSpace = 1;
         int secondSpace = 1;
         while (!itemsForScheduling.isEmpty()) {
-            if (firstSpace > secondSpace) {
+            if (firstSpace > secondSpace
+                    * itemsForScheduling.get(itemsForScheduling.size() - 1).size()) {
                 List<List<Event>> item = itemsForScheduling.remove(itemsForScheduling.size() - 1);
                 secondList.add(item);
                 secondSpace *= item.size();
@@ -102,8 +103,8 @@ public class Top5Timetables extends AppCompatActivity {
                 firstList.add(item);
                 firstSpace *= item.size();
             }
+            Log.v("space", "First: " + firstSpace + ", Second: " + secondSpace);
         }
-        Log.v("space", "First: " + firstSpace + ", Second: " + secondSpace);
 
         // First stage list of timetables
         TimetableGeneration tg1 = new TimetableGeneration();
@@ -115,6 +116,7 @@ public class Top5Timetables extends AppCompatActivity {
 
         timetables = new ArrayList<>();
         for (int i = 0; i < firstStage.size() && i < NUM_CONSIDER; i++) {
+            Log.v("Top5Timetables", "Second (" + i + ")");
             TimetableGeneration tg2 = new TimetableGeneration();
             tg2.setEvents(firstStage.get(i).events, secondList);
             timetables.addAll(tg2.getListOfTimetables());
