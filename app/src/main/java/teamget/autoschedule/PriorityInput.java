@@ -3,6 +3,7 @@ package teamget.autoschedule;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.DialogFragment;
@@ -21,6 +22,7 @@ import com.github.clans.fab.FloatingActionButton;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import java.time.DayOfWeek;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -28,6 +30,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import teamget.autoschedule.schedule.AvoidLessonsAfterPriority;
+import teamget.autoschedule.schedule.AvoidLessonsBeforePriority;
+import teamget.autoschedule.schedule.FreePeriodPriority;
+import teamget.autoschedule.schedule.LunchBreakPriority;
 import teamget.autoschedule.schedule.MaxFreeDaysPriority;
 import teamget.autoschedule.schedule.MinimalBreaksPriority;
 import teamget.autoschedule.schedule.MinimalTravellingPriority;
@@ -133,6 +139,77 @@ public class PriorityInput extends AppCompatActivity implements NumberPicker.OnV
                 showNumberPicker(view);
             }
         });
+
+        // load previously selected priorities
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        boolean isAccessed = prefs.getBoolean(getString(R.string.is_setup), false);
+
+        if (isAccessed) {
+            Set<String> prioritySet = priorityPref.getStringSet("priorities", null);
+            List<String> moduleJson = new ArrayList<String>(prioritySet);
+            List<Priority> priorities = new ArrayList<>();
+
+            final Gson gson = new GsonBuilder()
+                    .registerTypeAdapter(Priority.class, new TypeAdapter())
+                    .create();
+            for (String s : moduleJson) {
+                Priority p = gson.fromJson(s, Priority.class);
+                if (p instanceof AvoidLessonsBeforePriority) {
+                    TextView text = (TextView) findViewById(R.id.text_to_fill);
+                    int time = ((AvoidLessonsBeforePriority) p).time;
+                    text.setText(String.format("Avoid lessons before %d:00", time));
+                    lf.addItem((String) text.getText().toString(), new AvoidLessonsBeforePriority(p.rank, time));
+                } else if (p instanceof AvoidLessonsAfterPriority) {
+                    TextView text = (TextView) findViewById(R.id.text_to_fill);
+                    int time = ((AvoidLessonsAfterPriority) p).time;
+                    text.setText(String.format("Avoid lessons after %d:00", time));
+                    lf.addItem((String) text.getText().toString(), new AvoidLessonsAfterPriority(p.rank, time));
+                } else if (p instanceof MaxFreeDaysPriority) {
+                    TextView text = (TextView) findViewById(R.id.text_to_fill);
+                    text.setText("I want as many free days as possible.");
+                    lf.addItem((String) text.getText().toString(), new MaxFreeDaysPriority(p.rank));
+                } else if (p instanceof FreePeriodPriority) {
+                    TextView text = (TextView) findViewById(R.id.text_to_fill);
+                    int dayID = ((FreePeriodPriority) p).day;
+                    int fromTime = ((FreePeriodPriority) p).fromTime;
+                    int toTime = ((FreePeriodPriority) p).toTime;
+                    if (dayID == 5) {
+                        text.setText(String.format("I want to be free every day from %d:00 to %d:00.",
+                                fromTime, toTime));
+                    } else {
+                        String day = "";
+                        switch (dayID) {
+                            case 0:
+                                day = "Mon";
+                            case 1:
+                                day = "Tue";
+                            case 2:
+                                day = "Wed";
+                            case 3:
+                                day = "Thu";
+                            case 4:
+                                day = "Fri";
+                        }
+                        text.setText(String.format("I want to be free on %s from %d:00 to %d:00.",
+                                day, fromTime, toTime));
+                    }
+                    lf.addItem((String) text.getText().toString(), new FreePeriodPriority(p.rank, dayID, fromTime, toTime));
+                } else if (p instanceof MinimalTravellingPriority) {
+                    TextView text = (TextView) findViewById(R.id.text_to_fill);
+                    text.setText("I want minimal travelling across the campus.");
+                    lf.addItem((String) text.getText().toString(), new MinimalTravellingPriority(p.rank));
+                } else if (p instanceof MinimalBreaksPriority) {
+                    TextView text = (TextView) findViewById(R.id.text_to_fill);
+                    text.setText("I want minimal breaks between classes.");
+                    lf.addItem((String) text.getText().toString(), new MinimalBreaksPriority(p.rank));
+                } else if (p instanceof LunchBreakPriority) {
+                    TextView text = (TextView) findViewById(R.id.text_to_fill);
+                    int hours = ((LunchBreakPriority) p).hours;
+                    text.setText(String.format("I want a lunch break of at least %d hours.", hours));
+                    lf.addItem((String) text.getText().toString(), new LunchBreakPriority(p.rank, hours));
+                }
+            }
+        }
     }
 
     private void showFragment(Fragment fragment) {

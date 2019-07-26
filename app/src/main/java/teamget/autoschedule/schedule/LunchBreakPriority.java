@@ -1,7 +1,7 @@
 package teamget.autoschedule.schedule;
 
 public class LunchBreakPriority extends Priority {
-    int hours;
+    public int hours;
 
     public LunchBreakPriority(int rank, int hours) {
         super(rank);

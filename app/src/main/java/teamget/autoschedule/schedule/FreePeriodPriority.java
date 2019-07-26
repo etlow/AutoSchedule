@@ -1,9 +1,9 @@
 package teamget.autoschedule.schedule;
 
 public class FreePeriodPriority extends Priority {
-    int day;
-    int fromTime;
-    int toTime;
+    public int day;
+    public int fromTime;
+    public int toTime;
 
     public FreePeriodPriority(int rank, int day, int fromTime, int toTime) {
         super(rank);

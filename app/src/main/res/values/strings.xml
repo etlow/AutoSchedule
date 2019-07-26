@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">AutoSchedule</string>
     <string name="title_activity_priority_input">PriorityInput</string>
+    <string name="is_setup">false</string>
 
     <string name="main.msg.welcome">Welcome to AutoSchedule!</string>
     <string name="main.button.start">Let\'s Get Started</string>
@@ -15,6 +16,7 @@
 
     <string name="priorityinput.toolbar.title">Rank your priorities</string>
     <string name="priorityinput.toolbar.done">Done</string>
+    <string name="priorityinput.is_input">false</string>
 
     <string name="top5timetables.toolbar.title">Choose your timetable</string>
     <string name="top5timetables.button.selecttimetable">Select timetable %d</string>

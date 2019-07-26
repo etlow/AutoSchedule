@@ -2,6 +2,7 @@ package teamget.autoschedule;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayout;
@@ -28,6 +29,12 @@ public class ChosenTimetable extends AppCompatActivity {
         setContentView(R.layout.activity_chosen_timetable);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        // To make app subsequently launch into this activity by default
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        SharedPreferences.Editor edit = prefs.edit();
+        edit.putBoolean(getString(R.string.is_setup), Boolean.TRUE);
+        edit.commit();
 
         SharedPreferences pref = getSharedPreferences("ChosenTimetable", MODE_PRIVATE);
         String timetableStr = pref.getString("timetable", null);

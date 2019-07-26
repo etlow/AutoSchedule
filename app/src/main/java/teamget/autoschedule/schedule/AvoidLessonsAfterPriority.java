@@ -1,7 +1,7 @@
 package teamget.autoschedule.schedule;
 
 public class AvoidLessonsAfterPriority extends Priority {
-    int time;
+    public int time;
 
     public AvoidLessonsAfterPriority(int rank, int time) {
         super(rank);
