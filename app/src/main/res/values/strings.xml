@@ -17,6 +17,7 @@
     <string name="priorityinput.toolbar.done">Done</string>
 
     <string name="top5timetables.toolbar.title">Choose your timetable</string>
+    <string name="top5timetables.button.selecttimetable">Select timetable %d</string>
 
     <string name="chosentimetable.toolbar.title">Your timetable</string>
 
