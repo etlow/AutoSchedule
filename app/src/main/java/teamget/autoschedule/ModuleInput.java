@@ -8,6 +8,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -15,12 +16,15 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.SearchView;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import com.nex3z.flowlayout.FlowLayout;
 
 public class ModuleInput extends AppCompatActivity implements SearchView.OnQueryTextListener {
 
@@ -30,6 +34,7 @@ public class ModuleInput extends AppCompatActivity implements SearchView.OnQuery
     ArrayList<String> moduleCodes;
     SharedPreferences modulePref;
     SharedPreferences.Editor spEditor;
+    ModuleAdapter moduleAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +42,8 @@ public class ModuleInput extends AppCompatActivity implements SearchView.OnQuery
         setContentView(R.layout.activity_module_input);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        moduleAdapter = new ModuleAdapter();
 
         modulePref = getApplicationContext().getSharedPreferences("ModulePreferences", MODE_PRIVATE);
         spEditor = modulePref.edit();
@@ -75,8 +82,17 @@ public class ModuleInput extends AppCompatActivity implements SearchView.OnQuery
                 Snackbar.make(findViewById(android.R.id.content),
                         parent.getItemAtPosition(position).toString() + " added!",
                         Snackbar.LENGTH_LONG).show();
+
+                addModuleToSelected(modCode);
             }
         });
+    }
+
+    public void addModuleToSelected(String text) {
+        FlowLayout flowLayout = findViewById(R.id.selected_mods);
+        TextView textView = buildLabel(text);
+        flowLayout.addView(textView);
+        moduleAdapter.notifyDataSetChanged();
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -114,5 +130,20 @@ public class ModuleInput extends AppCompatActivity implements SearchView.OnQuery
     public boolean onQueryTextChange(String newText) {
         adapter.getFilter().filter(newText);
         return false;
+    }
+
+    private TextView buildLabel(String text) {
+        TextView textView = new TextView(this);
+        textView.setText(text);
+        textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+        textView.setPadding((int)dpToPx(16), (int)dpToPx(8), (int)dpToPx(16), (int)dpToPx(8));
+        textView.setBackgroundResource(R.drawable.label_bg);
+
+        return textView;
+    }
+
+    private float dpToPx(float dp){
+        return TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP, dp, getResources().getDisplayMetrics());
     }
 }

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.nex3z.flowlayout.FlowLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    app:flFlow="true"
+    app:flChildSpacing="auto"
+    app:flChildSpacingForLastRow="align"
+    app:flRowSpacing="8dp">
+
+    <TextView
+        android:id="@+id/module_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="placeholder"
+        android:gravity="center"
+        android:padding="8dp"
+        android:background="@drawable/label_bg"/>
+
+</com.nex3z.flowlayout.FlowLayout>

@@ -47,12 +47,38 @@
 
     </android.support.design.widget.AppBarLayout>
 
+    <com.nex3z.flowlayout.FlowLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/selected_mods"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        app:flChildSpacing="8dp"
+        app:flChildSpacingForLastRow="8dp"
+        app:flRowSpacing="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/module_listview"
+        app:layout_constraintTop_toBottomOf="@+id/appBarLayout">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="clip_vertical|start"
+            android:text="Selected:"
+            android:textColor="@color/colorPrimaryDark" />
+
+    </com.nex3z.flowlayout.FlowLayout>
+
     <ListView
         android:id="@+id/module_listview"
         android:layout_width="412dp"
         android:layout_height="624dp"
         android:layout_below="@+id/module_searchview"
-        app:layout_constraintTop_toBottomOf="@+id/appBarLayout"
+        app:layout_constraintStart_toStartOf="@+id/appBarLayout"
+        app:layout_constraintTop_toBottomOf="@+id/selected_mods"
         tools:ignore="NotSibling" />
 
 </android.support.constraint.ConstraintLayout>
