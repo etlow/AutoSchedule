@@ -1,10 +1,7 @@
 package teamget.autoschedule;
 
 import android.content.Context;
-import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.support.annotation.NonNull;
-import android.support.annotation.RequiresApi;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.util.Consumer;
 import android.support.v7.widget.GridLayout;
@@ -16,7 +13,10 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import java.time.DayOfWeek;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.TreeSet;
 
 import teamget.autoschedule.mods.Lesson;
 import teamget.autoschedule.schedule.Event;
@@ -28,11 +28,9 @@ class TimetableRecyclerAdapter extends RecyclerView.Adapter<TimetableRecyclerAda
 
     static class MyViewHolder extends RecyclerView.ViewHolder {
         private ConstraintLayout constraintLayout;
-        private MyViewHolder(ConstraintLayout l, Consumer<Integer> onButtonClick) {
+        private MyViewHolder(ConstraintLayout l) {
             super(l);
             constraintLayout = l;
-            constraintLayout.getViewById(R.id.button)
-                    .setOnClickListener(view -> onButtonClick.accept(getAdapterPosition()));
         }
     }
 
@@ -49,36 +47,56 @@ class TimetableRecyclerAdapter extends RecyclerView.Adapter<TimetableRecyclerAda
                 .from(parent.getContext())
                 .inflate(R.layout.timetable_choice, parent, false);
 
-        return new MyViewHolder(constraintLayout, onButtonClick);
+        MyViewHolder viewHolder = new MyViewHolder(constraintLayout);
+        constraintLayout.getViewById(R.id.button)
+                .setOnClickListener(view -> onButtonClick.accept(viewHolder.getAdapterPosition()));
+        return viewHolder;
     }
 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder viewHolder, int position) {
-
-        GridLayout gridLayout = viewHolder.constraintLayout.findViewById(R.id.gridLayout);
-        Context context = viewHolder.constraintLayout.getContext();
+        ConstraintLayout constraintLayout = viewHolder.constraintLayout;
+        GridLayout gridLayout = constraintLayout.findViewById(R.id.gridLayout);
+        Context context = constraintLayout.getContext();
         Timetable timetable = timetables.get(position);
 
+        TreeSet<Integer> set = new TreeSet<>();
         int lastDay = 4;
-        int earliest = timetable.events.get(0).startHour;
-        int latest = timetable.events.get(0).endHour;
         for (Event event : timetable.events) {
             if (event.day > lastDay) lastDay = event.day;
-            if (event.startHour < earliest) earliest = event.startHour;
-            if (event.endHour > latest) latest = event.endHour;
+            set.add(event.startMinutes);
+            set.add(event.endMinutes);
         }
+
+        int earliest = set.first();
+        int latest = set.last();
+        for (int i = earliest - earliest % 60; i < latest; i += 60) { set.add(i); }
+        List<Integer> times = new ArrayList<>(set);
 
         gridLayout.removeAllViews();
         gridLayout.setRowCount(lastDay + 2);
-        gridLayout.setColumnCount(latest - earliest + 1);
-        for (int i = 0; i < latest - earliest; i++) {
-            gridLayout.addView(makeTextView(context, Integer.toString(i + earliest),
+        gridLayout.setColumnCount(times.size());
+        for (int i = 1; i < times.size(); i++) {
+            TextView textView = new TextView(context);
+            textView.setWidth(0);
+            GridLayout.LayoutParams params = new GridLayout.LayoutParams();
+            params.rowSpec = GridLayout.spec(0, 1);
+            params.columnSpec = GridLayout.spec(i, 1, times.get(i) - times.get(i - 1));
+            textView.setLayoutParams(params);
+            gridLayout.addView(textView);
+        }
+        int firstHourInMinutes = earliest;
+        if (earliest % 60 != 0) firstHourInMinutes += 60 - earliest % 60;
+        for (int i = firstHourInMinutes; i < latest; i += 60) {
+            int end = latest - i > 60 ? i + 60 : latest;
+            gridLayout.addView(makeTextView(context, Integer.toString(i / 60), 0,
                     Gravity.NO_GRAVITY, GridLayout.spec(0, 1),
-                    GridLayout.spec(i + 1, 1, 1), Gravity.FILL_HORIZONTAL));
+                    getSpec(times, i, end), Gravity.FILL_HORIZONTAL));
         }
         DayOfWeek[] days = DayOfWeek.values();
         for (int i = 0; i <= lastDay; i++) {
-            gridLayout.addView(makeTextView(context, days[i].name().substring(0, 3), Gravity.CENTER,
+            gridLayout.addView(makeTextView(context, days[i].name().substring(0, 3),
+                    Integer.MAX_VALUE, Gravity.CENTER,
                     GridLayout.spec(i + 1, 1), GridLayout.spec(0, 1),
                     Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL));
         }
@@ -86,19 +104,17 @@ class TimetableRecyclerAdapter extends RecyclerView.Adapter<TimetableRecyclerAda
             Lesson lesson = event.options.get(0).list.get(0);
             TextView textView = makeTextView(context,
                     lesson.moduleCode + "\n" + lesson.type.substring(0, 3)
-                            + "\n" + lesson.location.code,
+                            + "\n" + lesson.location.code, 0,
                     Gravity.CENTER, GridLayout.spec(event.day + 1, 1),
-                    GridLayout.spec(event.startHour - earliest + 1,
-                            event.endHour - event.startHour), Gravity.FILL_HORIZONTAL);
+                    getSpec(times, event.startMinutes, event.endMinutes), Gravity.FILL_HORIZONTAL);
             textView.setTextSize(8);
             textView.setBackgroundColor(context.getResources().getColor(R.color.colorPrimary));
             gridLayout.addView(textView);
         }
 
-        String text = String
-                .format(context.getString(R.string.top5timetables_button_selecttimetable),
-                        position + 1);
-        ((Button) viewHolder.constraintLayout.getViewById(R.id.button)).setText(text);
+        String text = String.format(context.getString(R.string
+                        .top5timetables_button_selecttimetable), position + 1);
+        ((Button) constraintLayout.getViewById(R.id.button)).setText(text);
     }
 
     @Override
@@ -106,11 +122,18 @@ class TimetableRecyclerAdapter extends RecyclerView.Adapter<TimetableRecyclerAda
         return timetables.size();
     }
 
-    private static TextView makeTextView(Context context, String text, int gravity,
+    private static GridLayout.Spec getSpec(List<Integer> list, int start, int end) {
+        int indexStart = Collections.binarySearch(list, start);
+        int indexEnd = Collections.binarySearch(list, end);
+        return GridLayout.spec(indexStart + 1, indexEnd - indexStart, end - start);
+    }
+
+    private static TextView makeTextView(Context context, String text, int maxWidth, int gravity,
                                          GridLayout.Spec rowSpec, GridLayout.Spec columnSpec,
                                          int paramGravity) {
         TextView textView = new TextView(context);
         textView.setText(text);
+        textView.setMaxWidth(maxWidth);
         textView.setGravity(gravity);
         GridLayout.LayoutParams params = new GridLayout.LayoutParams();
         params.rowSpec = rowSpec;

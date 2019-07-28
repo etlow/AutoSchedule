@@ -6,7 +6,9 @@ import java.util.List;
 public class Lesson {
     public int day;
     public int startHour;
+    public int startMin;
     public int endHour;
+    public int endMin;
     public boolean oddWeek;
     public boolean evenWeek;
     public boolean weeksSpecial;
@@ -20,7 +22,9 @@ public class Lesson {
                   String m, String t, Location l) {
         day = DayOfWeek.valueOf(d.toUpperCase()).ordinal();
         startHour = parseHour(s);
+        startMin = parseMin(s);
         endHour = parseHour(e);
+        endMin = parseMin(e);
         oddWeek = oW;
         evenWeek = eW;
         weeksSpecial = sW;
@@ -30,15 +34,17 @@ public class Lesson {
         location = l;
     }
 
-    private int parseHour(String time) {
-        return Integer.parseInt(time.substring(0, 2));
-    }
+    private int parseHour(String time) { return Integer.parseInt(time.substring(0, 2)); }
+    private int parseMin(String time) { return Integer.parseInt(time.substring(2, 4)); }
 
     public boolean overlaps(Lesson other) {
         if (day != other.day) return false;
-        if (startHour <= other.startHour && endHour <= other.startHour) return false;
-        if (startHour >= other.endHour && endHour >= other.endHour) return false;
-        if (oddWeek && other.oddWeek) return true;
+        int start = startHour * 60 + startMin;
+        int end = endHour * 60 + endMin;
+        int otherStart = other.startHour * 60 + other.startMin;
+        int otherEnd = other.endHour * 60 + other.endMin;
+        if (start < otherStart && end < otherStart) return false;
+        if (start > otherEnd && end > otherEnd) return false;
         if (evenWeek && other.evenWeek) return true;
         if (!weeksSpecial) return false;
         for (int i = 0; i < 13; i++) {
