@@ -83,6 +83,7 @@ public class SampleModules {
         if (instance == null) {
             instance = new SampleModules();
             SharedPreferences listPref = context.getSharedPreferences("ModuleList", Context.MODE_PRIVATE);
+            instance.currentYear = listPref.getString("year", null);
             instance.moduleCodes = instance.createModList(listPref.getString("list", null));
         }
     }
@@ -106,6 +107,7 @@ public class SampleModules {
             Log.v(TAG, result.substring(0, 300).replace('\n', '|'));
             SharedPreferences modulesPref = context.getSharedPreferences("ModuleList", Context.MODE_PRIVATE);
             SharedPreferences.Editor modulesEditor = modulesPref.edit();
+            modulesEditor.putString("year", currentYear);
             modulesEditor.putString("list", result);
             modulesEditor.apply();
             moduleCodes = createModList(result);
