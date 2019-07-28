@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -47,16 +48,16 @@ public class Top5Timetables extends AppCompatActivity {
         // Receive SP for modules and priorities
         SharedPreferences modulePrefs = getSharedPreferences("ModulePreferences", MODE_PRIVATE);
         int semester = modulePrefs.getInt("semester", 0);
-        Set<String> moduleSet = modulePrefs.getStringSet("modules", null);
-        List<String> moduleCodes = new ArrayList<String>(moduleSet);
+        Set<String> moduleSet = modulePrefs.getStringSet("modules", Collections.emptySet());
+        List<String> moduleCodes = new ArrayList<>(moduleSet);
         List<Module> modules = new ArrayList<>();
         for (String s : moduleCodes) {
             modules.add(SampleModules.getModuleByCode(semester, s, getApplicationContext()));
         }
 
         SharedPreferences priorityPrefs = getSharedPreferences("PriorityPreferences", MODE_PRIVATE);
-        Set<String> prioritySet = priorityPrefs.getStringSet("priorities", null);
-        List<String> moduleJson = new ArrayList<String>(prioritySet);
+        Set<String> prioritySet = priorityPrefs.getStringSet("priorities", Collections.emptySet());
+        List<String> moduleJson = new ArrayList<>(prioritySet);
         List<Priority> priorities = new ArrayList<>();
 
         final Gson gson = new GsonBuilder()
@@ -129,6 +130,9 @@ public class Top5Timetables extends AppCompatActivity {
 
         adapter = new TimetableRecyclerAdapter(timetables, this::onButtonClick);
         recyclerView.setAdapter(adapter);
+
+        recyclerView.addItemDecoration(new DividerItemDecoration(getApplicationContext(),
+                DividerItemDecoration.VERTICAL));
     }
 
     public void onButtonClick(int position) {
