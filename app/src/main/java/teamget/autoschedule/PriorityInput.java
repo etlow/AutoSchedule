@@ -140,6 +140,7 @@ public class PriorityInput extends AppCompatActivity implements NumberPicker.OnV
             }
         });
 
+        /* FIX: NullPointerException -- lf.addItem() -- listAdapter.notifyDataSetChanged()
         // load previously selected priorities
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         boolean isAccessed = prefs.getBoolean(getString(R.string.is_setup), false);
@@ -147,7 +148,6 @@ public class PriorityInput extends AppCompatActivity implements NumberPicker.OnV
         if (isAccessed) {
             Set<String> prioritySet = priorityPref.getStringSet("priorities", null);
             List<String> moduleJson = new ArrayList<String>(prioritySet);
-            List<Priority> priorities = new ArrayList<>();
 
             final Gson gson = new GsonBuilder()
                     .registerTypeAdapter(Priority.class, new TypeAdapter())
@@ -179,16 +179,11 @@ public class PriorityInput extends AppCompatActivity implements NumberPicker.OnV
                     } else {
                         String day = "";
                         switch (dayID) {
-                            case 0:
-                                day = "Mon";
-                            case 1:
-                                day = "Tue";
-                            case 2:
-                                day = "Wed";
-                            case 3:
-                                day = "Thu";
-                            case 4:
-                                day = "Fri";
+                            case 0: day = "Mon";
+                            case 1: day = "Tue";
+                            case 2: day = "Wed";
+                            case 3: day = "Thu";
+                            case 4: day = "Fri";
                         }
                         text.setText(String.format("I want to be free on %s from %d:00 to %d:00.",
                                 day, fromTime, toTime));
@@ -210,7 +205,9 @@ public class PriorityInput extends AppCompatActivity implements NumberPicker.OnV
                 }
             }
         }
+        */
     }
+
 
     private void showFragment(Fragment fragment) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();

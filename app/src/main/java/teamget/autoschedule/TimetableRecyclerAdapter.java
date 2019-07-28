@@ -1,7 +1,10 @@
 package teamget.autoschedule;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.util.Consumer;
 import android.support.v7.widget.GridLayout;
