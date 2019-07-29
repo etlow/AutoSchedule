@@ -29,9 +29,9 @@
                 android:icon="@drawable/ic_timetable"
                 app:showAsAction="ifRoom"
                 android:title="Choose other timetable" />
-            <item
-                android:id="@+id/action_log_in_out"
-                android:title="Item" />
+            <item android:id="@+id/action_log_in_out"
+                android:icon="@drawable/ic_clipboard_account"
+                android:title="Log in / out" />
 
         </menu>
 
