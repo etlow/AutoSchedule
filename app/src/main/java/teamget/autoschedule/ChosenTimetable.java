@@ -1,5 +1,7 @@
 package teamget.autoschedule;
 
+import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -116,8 +118,15 @@ public class ChosenTimetable extends AppCompatActivity {
             textView.setBackgroundColor(context.getResources().getColor(R.color.colorPrimary));
             gridLayout.addView(textView);
         }
+
         LinearLayout linearLayout = findViewById(R.id.chosenTimetableLinear);
         linearLayout.addView(gridLayout);
+
+        AppWidgetManager awm = AppWidgetManager.getInstance(this);
+        int[] ids = awm.getAppWidgetIds(new ComponentName(this, ChosenTimetableWidget.class));
+        Intent updateIntent = new Intent(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+        updateIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
+        sendBroadcast(updateIntent);
     }
 
     private static GridLayout.Spec getSpec(List<Integer> list, int start, int end) {

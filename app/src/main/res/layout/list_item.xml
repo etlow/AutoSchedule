@@ -59,6 +59,29 @@
             android:layout_height="wrap_content"
             android:textSize="15sp"/>
 
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_gravity="end">
+
+            <com.github.ivbaranov.mfb.MaterialFavoriteButton
+                android:id="@+id/must_have_toggle"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginRight="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_gravity="center_vertical"
+                app:mfb_animate_favorite="true"
+                app:mfb_animate_unfavorite="false"
+                app:mfb_padding="8"
+                app:mfb_rotation_duration="400"
+                app:mfb_rotation_angle="360"
+                app:mfb_bounce_duration="300"
+                app:mfb_size="44"/>
+
+        </LinearLayout>
+
     </LinearLayout>
 
 </com.woxthebox.draglistview.swipe.ListSwipeItem>
