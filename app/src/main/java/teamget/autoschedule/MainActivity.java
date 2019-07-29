@@ -112,7 +112,7 @@ public class MainActivity extends AppCompatActivity {
                     Log.d(TAG, "DocumentSnapshot data: " + document.getData());
                     Map<String, ?> map = document.getData();
                     assert map != null;
-                    setModulePreferences(map);
+                    setChosenTimetable(map);
                     Intent intent = new Intent(this, ChosenTimetable.class);
                     startActivity(intent);
                 } else {
@@ -126,9 +126,9 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void setModulePreferences(Map<String, ?> map) {
-        SharedPreferences modulePrefs = getSharedPreferences("ModulePreferences", MODE_PRIVATE);
-        SharedPreferences.Editor editor = modulePrefs.edit();
+    private void setChosenTimetable(Map<String, ?> map) {
+        SharedPreferences pref = getSharedPreferences("ChosenTimetable", MODE_PRIVATE);
+        SharedPreferences.Editor editor = pref.edit();
         for (Map.Entry<String, ?> entry : map.entrySet()) {
             Object value = entry.getValue();
             if (value instanceof String) {
