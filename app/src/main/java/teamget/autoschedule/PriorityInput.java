@@ -119,7 +119,7 @@ public class PriorityInput extends AppCompatActivity implements NumberPicker.OnV
             @Override
             public void onClick(View view) {
                 TextView text = (TextView) findViewById(R.id.text_to_fill);
-                text.setText("I want minimal travelling across the campus.");
+                text.setText("I want minimal travelling across the \ncampus.");
                 lf.addItem((String) text.getText().toString(), new MinimalTravellingPriority(0));
             }
         });

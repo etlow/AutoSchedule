@@ -45,7 +45,7 @@ public class BeforeTimePicker extends DialogFragment implements TimePickerDialog
 
     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
         TextView text = (TextView) getActivity().findViewById(R.id.text_to_fill);
-        text.setText(String.format("Avoid lessons before %d:%02d", hourOfDay, minute));
+        text.setText(String.format("Avoid lessons before %d:%02d.", hourOfDay, minute));
         lf.addItem((String) text.getText().toString(), new AvoidLessonsBeforePriority(0, hourOfDay));
     }
 }

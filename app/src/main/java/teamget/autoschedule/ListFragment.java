@@ -105,7 +105,8 @@ public class ListFragment extends Fragment {
                 mRefreshLayout.setEnabled(true);
 
                 // Swipe to delete on left
-                if (swipedDirection == ListSwipeItem.SwipeDirection.LEFT) {
+                if (swipedDirection == ListSwipeItem.SwipeDirection.LEFT ||
+                    swipedDirection == ListSwipeItem.SwipeDirection.RIGHT) {
                     Pair<Long, String> adapterItem = (Pair<Long, String>) item.getTag();
                     int pos = mDragListView.getAdapter().getPositionForItem(adapterItem);
                     mDragListView.getAdapter().removeItem(pos);

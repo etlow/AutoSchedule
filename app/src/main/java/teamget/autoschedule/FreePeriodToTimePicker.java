@@ -34,8 +34,11 @@ public class FreePeriodToTimePicker extends DialogFragment implements TimePicker
                 this, hour, minute, DateFormat.is24HourFormat(getActivity()));
 
         TextView tvTitle = new TextView(getActivity());
-        tvTitle.setText(String.format("I want to be free on %s from %d:%02d to...",
-                        day.substring(0,3), fromTimeHour, fromTimeMinute));
+        int dayID = day.equals("Every day") ? 5 : DayOfWeek.valueOf(day.toUpperCase()).ordinal();
+        if (dayID == 5) { tvTitle.setText(String.format("I want to be free every day from %d:%02d to...",
+                fromTimeHour, fromTimeMinute)); }
+        else { tvTitle.setText(String.format("I want to be free on %s from %d:%02d to...",
+                day.substring(0,3), fromTimeHour, fromTimeMinute)); }
         tvTitle.setTextColor(getResources().getColor(R.color.colorPrimaryDark));
         tvTitle.setBackgroundColor(getResources().getColor(R.color.colorPrimaryLight));
         tvTitle.setPadding(5, 3, 5, 3);
@@ -58,10 +61,10 @@ public class FreePeriodToTimePicker extends DialogFragment implements TimePicker
         TextView text = (TextView) getActivity().findViewById(R.id.text_to_fill);
         int dayID = day.equals("Every day") ? 5 : DayOfWeek.valueOf(day.toUpperCase()).ordinal();
         if (dayID == 5) {
-            text.setText(String.format("I want to be free every day from %d:%02d to %d:%02d.",
+            text.setText(String.format("I want to be free every day from %d:%02d \nto %d:%02d.",
                     fromTimeHour, fromTimeMinute, hourOfDay, minute));
         } else {
-            text.setText(String.format("I want to be free on %s from %d:%02d to %d:%02d.",
+            text.setText(String.format("I want to be free on %s from %d:%02d to \n%d:%02d.",
                     day.substring(0, 3), fromTimeHour, fromTimeMinute, hourOfDay, minute));
         }
         lf.addItem((String) text.getText().toString(), new FreePeriodPriority(0, dayID, fromTimeHour, hourOfDay));

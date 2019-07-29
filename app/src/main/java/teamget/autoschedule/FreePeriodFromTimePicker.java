@@ -10,6 +10,8 @@ import android.view.Gravity;
 import android.widget.TextView;
 import android.support.v4.app.DialogFragment;
 import android.app.Dialog;
+
+import java.time.DayOfWeek;
 import java.util.Calendar;
 import android.widget.TimePicker;
 
@@ -28,7 +30,9 @@ public class FreePeriodFromTimePicker extends DialogFragment implements TimePick
                 this, hour, minute, DateFormat.is24HourFormat(getActivity()));
 
         TextView tvTitle = new TextView(getActivity());
-        tvTitle.setText("I want to be free on " + day.substring(0,3) + " from...");
+        int dayID = day.equals("Every day") ? 5 : DayOfWeek.valueOf(day.toUpperCase()).ordinal();
+        if (dayID == 5) { tvTitle.setText("I want to be free every day from..."); }
+        else { tvTitle.setText("I want to be free on " + day.substring(0,3) + " from..."); }
         tvTitle.setTextColor(getResources().getColor(R.color.colorPrimaryDark));
         tvTitle.setBackgroundColor(getResources().getColor(R.color.colorPrimaryLight));
         tvTitle.setPadding(5, 3, 5, 3);
