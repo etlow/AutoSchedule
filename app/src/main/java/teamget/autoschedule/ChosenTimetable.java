@@ -10,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayout;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -17,10 +18,14 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.firebase.ui.auth.AuthUI;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.gson.Gson;
 
 import java.time.DayOfWeek;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.TreeSet;
@@ -30,6 +35,7 @@ import teamget.autoschedule.schedule.Event;
 import teamget.autoschedule.schedule.Timetable;
 
 public class ChosenTimetable extends AppCompatActivity {
+    private static final int RC_SIGN_IN = 123;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -160,6 +166,25 @@ public class ChosenTimetable extends AppCompatActivity {
         return true;
     }
 
+    public boolean onMenuOpened(int featureId, Menu menu) {
+        if (menu == null) {
+            Log.v("ChosenTimetable", "menu is null");
+        } else {
+            String text;
+            FirebaseAuth auth = FirebaseAuth.getInstance();
+            FirebaseUser user = auth.getCurrentUser();
+            if (user != null && !user.isAnonymous()) {
+                // already signed in
+                text = "Log out";
+            } else {
+                // not signed in or anonymous
+                text = "Log in";
+            }
+            menu.findItem(R.id.action_log_in_out).setTitle(text);
+        }
+        return super.onPrepareOptionsMenu(menu);
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -182,9 +207,54 @@ public class ChosenTimetable extends AppCompatActivity {
                 startActivity(intent);
                 return true;
 
+            case R.id.action_log_in_out:
+                if (item.getTitle().length() == 7) {
+                    signOut();
+                } else {
+                    startSignIn();
+                }
+                return true;
+
             default:
                 return super.onOptionsItemSelected(item);
 
         }
+    }
+
+    private void startSignIn() {
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        FirebaseUser user = auth.getCurrentUser();
+        if (user == null || user.isAnonymous()) {
+            // not signed in
+            List<AuthUI.IdpConfig> providers = Arrays.asList(
+                    new AuthUI.IdpConfig.EmailBuilder().build(),
+                    new AuthUI.IdpConfig.PhoneBuilder().build(),
+                    new AuthUI.IdpConfig.GoogleBuilder().build(),
+                    // new AuthUI.IdpConfig.FacebookBuilder().build(),
+                    // new AuthUI.IdpConfig.TwitterBuilder().build(),
+                    new AuthUI.IdpConfig.AnonymousBuilder().build());
+
+            // Create and launch sign-in intent
+            startActivityForResult(
+                    AuthUI.getInstance()
+                            .createSignInIntentBuilder()
+                            .enableAnonymousUsersAutoUpgrade()
+                            .setAvailableProviders(providers)
+                            .setLogo(R.drawable.ic_timetable)
+                            .build(),
+                    RC_SIGN_IN);
+        }
+    }
+
+    private void signOut() {
+        AuthUI.getInstance()
+                .signOut(this)
+                .addOnCompleteListener(task -> {
+                    // user is now signed out
+                    Intent intent = new Intent(this, MainActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(intent);
+                    finish();
+                });
     }
 }

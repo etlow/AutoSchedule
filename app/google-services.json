@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "981868651269",
+    "firebase_url": "https://autoschedule1.firebaseio.com",
+    "project_id": "autoschedule1",
+    "storage_bucket": "autoschedule1.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:981868651269:android:afb0c4cfbd51a12e",
+        "android_client_info": {
+          "package_name": "teamget.autoschedule"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "981868651269-9esodsfr99gip7d4l1d447pgkfgpgvrt.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD_kpJq28wlnvAHQS3V6uJJNFlwSXXcKoA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "981868651269-9esodsfr99gip7d4l1d447pgkfgpgvrt.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
