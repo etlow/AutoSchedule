@@ -27,6 +27,7 @@ public class MaxFreeDaysPriority extends Priority {
 
     @Override
     public double getScoreMultiplier(Timetable t) {
+        if (maxPossibleFreeDays == 0) return 1;
         int maxFreeDays = findMaxFreeDays(t);
         double multiplier = maxFreeDays / maxPossibleFreeDays;
         return multiplier;
