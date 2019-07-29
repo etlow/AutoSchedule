@@ -1,6 +1,7 @@
 package teamget.autoschedule;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -9,9 +10,15 @@ import android.view.View;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.IdpResponse;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
     // First launch welcome screen
@@ -28,8 +35,7 @@ public class MainActivity extends AppCompatActivity {
         FirebaseAuth auth = FirebaseAuth.getInstance();
         if (auth.getCurrentUser() != null) {
             // already signed in
-            Intent intent = new Intent(this, SemesterSelection.class);
-            startActivity(intent);
+            downloadAndContinue();
         } else {
             // not signed in
             startSignIn();
@@ -68,8 +74,7 @@ public class MainActivity extends AppCompatActivity {
 
             // Successfully signed in
             if (resultCode == RESULT_OK) {
-                Intent intent = new Intent(this, SemesterSelection.class);
-                startActivity(intent);
+                downloadAndContinue();
                 // startActivity(SignedInActivity.createIntent(this, response));
                 // finish();
             } else {
@@ -91,5 +96,54 @@ public class MainActivity extends AppCompatActivity {
                 Log.e(TAG, "Sign-in error: ", response.getError());
             }
         }
+    }
+
+    private void downloadAndContinue() {
+        String uid = FirebaseAuth.getInstance().getUid();
+        assert uid != null;
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        DocumentReference docRef = db.collection("users").document(uid)
+                .collection("data").document("ChosenTimetable");
+        docRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot document = task.getResult();
+                assert document != null;
+                if (document.exists()) {
+                    Log.d(TAG, "DocumentSnapshot data: " + document.getData());
+                    Map<String, ?> map = document.getData();
+                    assert map != null;
+                    setModulePreferences(map);
+                    Intent intent = new Intent(this, ChosenTimetable.class);
+                    startActivity(intent);
+                } else {
+                    Log.d(TAG, "No such document");
+                    Intent intent = new Intent(this, SemesterSelection.class);
+                    startActivity(intent);
+                }
+            } else {
+                Log.d(TAG, "get failed with ", task.getException());
+            }
+        });
+    }
+
+    private void setModulePreferences(Map<String, ?> map) {
+        SharedPreferences modulePrefs = getSharedPreferences("ModulePreferences", MODE_PRIVATE);
+        SharedPreferences.Editor editor = modulePrefs.edit();
+        for (Map.Entry<String, ?> entry : map.entrySet()) {
+            Object value = entry.getValue();
+            if (value instanceof String) {
+                editor.putString(entry.getKey(), (String) value);
+            } else if (value instanceof Integer) {
+                editor.putInt(entry.getKey(), (Integer) value);
+            } else if (value instanceof List) {
+                List list = (List) value;
+                Set<String> set = new HashSet<>();
+                for (Object str : list) {
+                    set.add((String) str);
+                }
+                editor.putStringSet(entry.getKey(), set);
+            }
+        }
+        editor.apply();
     }
 }

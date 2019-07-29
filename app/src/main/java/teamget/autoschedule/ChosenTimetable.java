@@ -5,9 +5,9 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.GridLayout;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -21,13 +21,18 @@ import android.widget.TextView;
 import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.gson.Gson;
 
 import java.time.DayOfWeek;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.TreeSet;
 
 import teamget.autoschedule.mods.Lesson;
@@ -35,6 +40,7 @@ import teamget.autoschedule.schedule.Event;
 import teamget.autoschedule.schedule.Timetable;
 
 public class ChosenTimetable extends AppCompatActivity {
+    private static final String TAG = "ChosenTimetable";
     private static final int RC_SIGN_IN = 123;
 
     @Override
@@ -43,6 +49,8 @@ public class ChosenTimetable extends AppCompatActivity {
         setContentView(R.layout.activity_chosen_timetable);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        storeData();
 
         // To make app subsequently launch into this activity by default
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
@@ -53,10 +61,22 @@ public class ChosenTimetable extends AppCompatActivity {
         SharedPreferences pref = getSharedPreferences("ChosenTimetable", MODE_PRIVATE);
         String timetableStr = pref.getString("timetable", null);
         Gson gson = new Gson();
-        GridLayout gridLayout = new GridLayout(getApplicationContext());
-        Context context = getApplicationContext();
         Timetable timetable = gson.fromJson(timetableStr, Timetable.class);
+        GridLayout gridLayout = new GridLayout(getApplicationContext());
+        populateGridLayout(gridLayout, timetable);
 
+        LinearLayout linearLayout = findViewById(R.id.chosenTimetableLinear);
+        linearLayout.addView(gridLayout);
+
+        AppWidgetManager awm = AppWidgetManager.getInstance(this);
+        int[] ids = awm.getAppWidgetIds(new ComponentName(this, ChosenTimetableWidget.class));
+        Intent updateIntent = new Intent(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+        updateIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
+        sendBroadcast(updateIntent);
+    }
+
+    private void populateGridLayout(GridLayout gridLayout, Timetable timetable) {
+        Context context = getApplicationContext();
         TreeSet<Integer> set = new TreeSet<>();
         int lastDay = 4;
         for (Event event : timetable.events) {
@@ -124,15 +144,6 @@ public class ChosenTimetable extends AppCompatActivity {
             textView.setBackgroundColor(context.getResources().getColor(R.color.colorPrimary));
             gridLayout.addView(textView);
         }
-
-        LinearLayout linearLayout = findViewById(R.id.chosenTimetableLinear);
-        linearLayout.addView(gridLayout);
-
-        AppWidgetManager awm = AppWidgetManager.getInstance(this);
-        int[] ids = awm.getAppWidgetIds(new ComponentName(this, ChosenTimetableWidget.class));
-        Intent updateIntent = new Intent(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
-        updateIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
-        sendBroadcast(updateIntent);
     }
 
     private static GridLayout.Spec getSpec(List<Integer> list, int start, int end) {
@@ -163,16 +174,9 @@ public class ChosenTimetable extends AppCompatActivity {
 
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.chosen_timetable_action_bar, menu);
-        return true;
-    }
-
-    public boolean onMenuOpened(int featureId, Menu menu) {
-        if (menu == null) {
-            Log.v("ChosenTimetable", "menu is null");
-        } else {
+        FirebaseAuth.AuthStateListener listener = firebaseAuth -> {
             String text;
-            FirebaseAuth auth = FirebaseAuth.getInstance();
-            FirebaseUser user = auth.getCurrentUser();
+            FirebaseUser user = firebaseAuth.getCurrentUser();
             if (user != null && !user.isAnonymous()) {
                 // already signed in
                 text = "Log out";
@@ -181,8 +185,12 @@ public class ChosenTimetable extends AppCompatActivity {
                 text = "Log in";
             }
             menu.findItem(R.id.action_log_in_out).setTitle(text);
-        }
-        return super.onPrepareOptionsMenu(menu);
+        };
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        auth.addAuthStateListener(listener);
+        // Call listener once to update menu item text
+        listener.onAuthStateChanged(auth);
+        return true;
     }
 
     @Override
@@ -251,10 +259,49 @@ public class ChosenTimetable extends AppCompatActivity {
                 .signOut(this)
                 .addOnCompleteListener(task -> {
                     // user is now signed out
+                    PreferenceManager.getDefaultSharedPreferences(getBaseContext())
+                            .edit().clear().apply();
+                    getSharedPreferences("ModulePreferences", MODE_PRIVATE)
+                            .edit().clear().apply();
+                    getSharedPreferences("PriorityPreferences", MODE_PRIVATE)
+                            .edit().clear().apply();
                     Intent intent = new Intent(this, MainActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(intent);
                     finish();
                 });
+    }
+
+    private void storeData() {
+        SharedPreferences modulePrefs = getSharedPreferences("ModulePreferences", MODE_PRIVATE);
+        Map<String, ?> map = modulePrefs.getAll();
+        Map<String, Object> newMap = new HashMap<>(map);
+        Set modules = (Set) newMap.get("modules");
+        if (modules != null) newMap.put("modules", new ArrayList<Object>(modules));
+
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        String uid = auth.getUid();
+        if (uid == null) return;
+
+        // Access a Cloud Firestore instance from your Activity
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        CollectionReference coll =  db.collection("users").document(uid)
+                .collection("data");
+        coll.document("ModulePreferences")
+                .set(newMap)
+                .addOnSuccessListener(aVoid ->
+                        Log.d(TAG, "DocumentSnapshot successfully written!"))
+                .addOnFailureListener(e -> Log.w(TAG, "Error writing document", e));
+
+        String timetable = getSharedPreferences("ChosenTimetable", MODE_PRIVATE)
+                .getString("timetable", null);
+        assert timetable != null;
+        Map<String, String> chosen = new HashMap<>();
+        chosen.put("timetable", timetable);
+        coll.document("ChosenTimetable")
+                .set(chosen)
+                .addOnSuccessListener(aVoid ->
+                        Log.d(TAG, "DocumentSnapshot successfully written!"))
+                .addOnFailureListener(e -> Log.w(TAG, "Error writing document", e));
     }
 }
