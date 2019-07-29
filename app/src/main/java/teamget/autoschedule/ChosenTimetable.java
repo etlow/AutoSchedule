@@ -172,25 +172,29 @@ public class ChosenTimetable extends AppCompatActivity {
         return textView;
     }
 
+    private void updateLogInOut(Menu menu, FirebaseAuth firebaseAuth) {
+        String text;
+        FirebaseUser user = firebaseAuth.getCurrentUser();
+        if (user != null && !user.isAnonymous()) {
+            // already signed in
+            text = "Log out";
+        } else {
+            // not signed in or anonymous
+            text = "Log in";
+        }
+        menu.findItem(R.id.action_log_in_out).setTitle(text);
+    }
+
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.chosen_timetable_action_bar, menu);
-        FirebaseAuth.AuthStateListener listener = firebaseAuth -> {
-            String text;
-            FirebaseUser user = firebaseAuth.getCurrentUser();
-            if (user != null && !user.isAnonymous()) {
-                // already signed in
-                text = "Log out";
-            } else {
-                // not signed in or anonymous
-                text = "Log in";
-            }
-            menu.findItem(R.id.action_log_in_out).setTitle(text);
-        };
-        FirebaseAuth auth = FirebaseAuth.getInstance();
-        auth.addAuthStateListener(listener);
-        // Call listener once to update menu item text
-        listener.onAuthStateChanged(auth);
+        FirebaseAuth.getInstance().addAuthStateListener(auth -> updateLogInOut(menu, auth));
         return true;
+    }
+
+    @Override
+    public boolean onMenuOpened(int featureId, Menu menu) {
+        updateLogInOut(menu, FirebaseAuth.getInstance());
+        return super.onMenuOpened(featureId, menu);
     }
 
     @Override
@@ -248,7 +252,7 @@ public class ChosenTimetable extends AppCompatActivity {
                             .createSignInIntentBuilder()
                             .enableAnonymousUsersAutoUpgrade()
                             .setAvailableProviders(providers)
-                            .setLogo(R.drawable.ic_timetable)
+                            .setLogo(R.drawable.autoschedule_logo)
                             .build(),
                     RC_SIGN_IN);
         }
