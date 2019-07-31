@@ -111,7 +111,7 @@ public class SampleModules {
             modulesEditor.putString("list", result);
             modulesEditor.apply();
             moduleCodes = createModList(result);
-        }).execute("https://nusmods.com/api/v2/" + currentYear + "/moduleList.json");
+        }).execute("https://api.nusmods.com/v2/" + currentYear + "/moduleList.json");
     }
 
     private void getModsTest(final String code, final Context context) {
@@ -121,7 +121,7 @@ public class SampleModules {
             SharedPreferences.Editor modulesEditor = modulesPref.edit();
             modulesEditor.putString(code, result);
             modulesEditor.apply();
-        }).execute("https://nusmods.com/api/v2/" + currentYear + "/modules/" + code + ".json");
+        }).execute("https://api.nusmods.com/v2/" + currentYear + "/modules/" + code + ".json");
     }
 
     private List<String> createModList(String result) {
