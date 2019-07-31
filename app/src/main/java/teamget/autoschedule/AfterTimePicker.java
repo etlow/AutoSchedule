@@ -2,13 +2,11 @@ package teamget.autoschedule;
 
 import android.app.AlertDialog;
 import android.app.TimePickerDialog;
-import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.text.format.DateFormat;
 import android.view.Gravity;
 import android.widget.TextView;
-import android.support.v4.app.DialogFragment;
+import androidx.fragment.app.DialogFragment;
 import android.app.Dialog;
 import java.util.Calendar;
 import android.widget.TimePicker;

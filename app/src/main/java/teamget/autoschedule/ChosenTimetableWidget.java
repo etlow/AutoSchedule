@@ -4,25 +4,7 @@ import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.support.v7.widget.GridLayout;
-import android.view.Gravity;
-import android.view.View;
-import android.widget.LinearLayout;
 import android.widget.RemoteViews;
-import android.widget.TextView;
-
-import com.google.gson.Gson;
-
-import java.time.DayOfWeek;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.TreeSet;
-
-import teamget.autoschedule.mods.Lesson;
-import teamget.autoschedule.schedule.Event;
-import teamget.autoschedule.schedule.Timetable;
 
 /**
  * Implementation of App Widget functionality.

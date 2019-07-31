@@ -1,6 +1,6 @@
 package teamget.autoschedule.mods;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 public class Location {
     private static double[][] distArr = {{0,457,520.9},{390.9,0,404.7},{503.2,471.5,0}};

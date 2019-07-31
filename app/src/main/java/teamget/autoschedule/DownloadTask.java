@@ -4,7 +4,7 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
-import android.support.v4.util.Consumer;
+import androidx.core.util.Consumer;
 
 import java.io.IOException;
 import java.io.InputStream;
