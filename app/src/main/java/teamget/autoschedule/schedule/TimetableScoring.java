@@ -18,23 +18,41 @@ public class TimetableScoring {
         double minPossibleDist = 10000000;
         double maxPossibleDist = 0;
         int maxFreeDays = 0;
+        int minPossibleHours = 10000;
+        int maxPossibleHours = 0;
+
         double dist;
         int maxDays;
+        int hours;
 
         for (int i = 0; i < list.size(); i++) {
             if (i % SAMPLE_PERIOD == 0) {
                 Timetable t = list.get(i);
+
                 dist = MinimalTravellingPriority.findDistance(t);
                 if (dist < minPossibleDist) {
+                    minPossibleDist = dist;
                     MinimalTravellingPriority.setMinPossibleDist(dist);
                 }
                 if (dist > maxPossibleDist) {
+                    maxPossibleDist = dist;
                     MinimalTravellingPriority.setMaxPossibleDist(dist);
                 }
 
                 maxDays = MaxFreeDaysPriority.findMaxFreeDays(t);
                 if (maxDays > maxFreeDays) {
+                    maxFreeDays = maxDays;
                     MaxFreeDaysPriority.setMaxPossibleFreeDays(maxDays);
+                }
+
+                hours = MinimalBreaksPriority.findHoursOfBreaks(t);
+                if (hours < minPossibleHours) {
+                    minPossibleHours = hours;
+                    MinimalBreaksPriority.setMinHoursOfBreaks(hours);
+                }
+                if (hours > maxPossibleHours) {
+                    maxPossibleHours = hours;
+                    MinimalBreaksPriority.setMaxHoursOfBreaks(hours);
                 }
             }
         }
