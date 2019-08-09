@@ -62,11 +62,8 @@ public class ChosenTimetable extends AppCompatActivity {
         String timetableStr = pref.getString("timetable", null);
         Gson gson = new Gson();
         Timetable timetable = gson.fromJson(timetableStr, Timetable.class);
-        GridLayout gridLayout = new GridLayout(getApplicationContext());
+        GridLayout gridLayout = findViewById(R.id.chosenTimetableGrid);
         populateGridLayout(gridLayout, timetable);
-
-        LinearLayout linearLayout = findViewById(R.id.chosenTimetableLinear);
-        linearLayout.addView(gridLayout);
 
         AppWidgetManager awm = AppWidgetManager.getInstance(this);
         int[] ids = awm.getAppWidgetIds(new ComponentName(this, ChosenTimetableWidget.class));
@@ -93,7 +90,6 @@ public class ChosenTimetable extends AppCompatActivity {
         gridLayout.removeAllViews();
         gridLayout.setColumnCount(lastDay + 2);
         gridLayout.setRowCount(times.size() * 2);
-        gridLayout.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
         // Spacers
         for (int i = 1; i < times.size(); i++) {
             TextView textView = new TextView(context);
