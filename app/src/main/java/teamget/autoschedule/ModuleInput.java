@@ -25,6 +25,9 @@ import java.util.List;
 import java.util.Set;
 
 import com.nex3z.flowlayout.FlowLayout;
+import com.google.android.material.chip.Chip;
+import com.google.android.material.chip.ChipDrawable;
+import com.google.android.material.chip.ChipGroup;
 
 public class ModuleInput extends AppCompatActivity implements SearchView.OnQueryTextListener {
 
@@ -35,6 +38,7 @@ public class ModuleInput extends AppCompatActivity implements SearchView.OnQuery
     SharedPreferences modulePref;
     SharedPreferences.Editor spEditor;
     ModuleAdapter moduleAdapter;
+    ChipGroup selectedMods;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,7 +82,6 @@ public class ModuleInput extends AppCompatActivity implements SearchView.OnQuery
                 spEditor.putStringSet("modules", newSet);
                 spEditor.commit();
 
-                // To-do: Stick selected modules to the top of list with "Added" tag
                 Snackbar.make(findViewById(android.R.id.content),
                         parent.getItemAtPosition(position).toString() + " added!",
                         Snackbar.LENGTH_LONG).show();
@@ -89,10 +92,31 @@ public class ModuleInput extends AppCompatActivity implements SearchView.OnQuery
     }
 
     public void addModuleToSelected(String text) {
-        FlowLayout flowLayout = findViewById(R.id.selected_mods);
-        TextView textView = buildLabel(text);
-        flowLayout.addView(textView);
+//        FlowLayout flowLayout = findViewById(R.id.selected_mods);
+//        TextView textView = buildLabel(text);
+//        flowLayout.addView(textView);
+//        moduleAdapter.notifyDataSetChanged();
+
+        selectedMods = (ChipGroup) findViewById(R.id.selected_mods);
+        Chip newMod = getChip(selectedMods, text);
+        selectedMods.addView(newMod);
         moduleAdapter.notifyDataSetChanged();
+    }
+
+    private Chip getChip(final ChipGroup chipGroup, String text){
+        final Chip chip = new Chip(this);
+        chip.setChipDrawable(ChipDrawable.createFromResource(this, R.xml.chip));
+        int paddingDp = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, getResources().getDisplayMetrics());
+        chip.setPadding(paddingDp, paddingDp, paddingDp, paddingDp);
+        chip.setText(text);
+        chip.setOnCloseIconClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                chipGroup.removeView(chip);
+
+            }
+        });
+        return chip;
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
