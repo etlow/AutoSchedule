@@ -1,5 +1,9 @@
 package teamget.autoschedule.schedule;
 
+import android.content.res.Resources;
+
+import teamget.autoschedule.R;
+
 public class AvoidLessonsBeforePriority extends Priority {
     public int time;
 
@@ -15,12 +19,18 @@ public class AvoidLessonsBeforePriority extends Priority {
         double multiplier = 1;
         for (int day = 0; day <= 4; day++) {
             for (Event e : t.events) {
-                if (e.startHour < time && e.day == day) {
+                if (e.startMinutes < time && e.day == day) {
                     multiplier = multiplier - 0.2;
                     break;
                 }
             }
         }
         return multiplier;
+    }
+
+    @Override
+    public String toString(Resources r) {
+        return r.getString(R.string.priority_avoid_before_description,
+                time / 60, time % 60);
     }
 }

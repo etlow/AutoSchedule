@@ -44,9 +44,9 @@ public class ListFragment extends Fragment {
         setHasOptionsMenu(true);
     }
 
-    public void addItem(String item, Priority priority) {
+    public void addItem(Priority priority) {
         itemID++;
-        mItemArray.add(new Pair<>(itemID, item));
+        mItemArray.add(new Pair<>(itemID, priority.toString(getResources())));
         priorities.put(itemID, priority);
         listAdapter.notifyDataSetChanged();
     }

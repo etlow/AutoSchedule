@@ -50,9 +50,11 @@ public class ModuleInput extends AppCompatActivity implements SearchView.OnQuery
 
         moduleAdapter = new ModuleAdapter();
 
-        modulePref = getApplicationContext().getSharedPreferences("ModulePreferences", MODE_PRIVATE);
+        modulePref = TimetablePreferences.getInstance().getPreferences(this);
         currModules = new HashSet<>(modulePref.getStringSet("modules", Collections.emptySet()));
         spEditor = modulePref.edit();
+
+        for (String mod : currModules) addModuleToSelected(mod);
 
         searchView = (SearchView) findViewById(R.id.module_searchview);
         listView = (ListView) findViewById(R.id.module_listview);

@@ -18,7 +18,7 @@
             <item android:id="@+id/action_edit_modules"
                 android:icon="@drawable/ic_book_open_variant"
                 app:showAsAction="ifRoom"
-                android:title="Edit modules" />
+                android:title="@string/chosen_timetable_menu_modules_edit" />
 
             <item android:id="@+id/action_edit_priorities"
                 android:icon="@drawable/ic_format_list_numbered"
@@ -29,9 +29,14 @@
                 android:icon="@drawable/ic_timetable"
                 app:showAsAction="ifRoom"
                 android:title="Choose other timetable" />
+
             <item android:id="@+id/action_log_in_out"
                 android:icon="@drawable/ic_clipboard_account"
-                android:title="Log in / out" />
+                android:title="@string/chosen_timetable_menu_log_in_out" />
+
+            <item
+                android:id="@+id/action_delete_account"
+                android:title="@string/chosen_timetable_menu_delete_account" />
 
         </menu>
 

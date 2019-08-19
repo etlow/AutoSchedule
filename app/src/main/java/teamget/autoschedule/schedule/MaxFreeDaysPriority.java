@@ -1,5 +1,9 @@
 package teamget.autoschedule.schedule;
 
+import android.content.res.Resources;
+
+import teamget.autoschedule.R;
+
 public class MaxFreeDaysPriority extends Priority {
     static int maxPossibleFreeDays;
 
@@ -31,5 +35,10 @@ public class MaxFreeDaysPriority extends Priority {
         int maxFreeDays = findMaxFreeDays(t);
         double multiplier = maxFreeDays / maxPossibleFreeDays;
         return multiplier;
+    }
+
+    @Override
+    public String toString(Resources r) {
+        return r.getString(R.string.priority_max_free_description);
     }
 }

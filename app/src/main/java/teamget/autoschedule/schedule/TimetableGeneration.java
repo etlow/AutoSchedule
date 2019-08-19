@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import teamget.autoschedule.TimetablePreferences;
 import teamget.autoschedule.mods.Lesson;
 import teamget.autoschedule.mods.Module;
 import teamget.autoschedule.mods.Option;
@@ -218,9 +219,8 @@ public class TimetableGeneration {
         }
     }
 
-    private static List<Module> getAndClearModules(Context context) {
-        SharedPreferences sharedPref = context.getSharedPreferences(
-                "ModulePreferences", Context.MODE_PRIVATE);
+    private static List<Module> getModules(Context context) {
+        SharedPreferences sharedPref = TimetablePreferences.getInstance().getPreferences(context);
         int semester = sharedPref.getInt("semester", 0);
         Set<String> modSet = sharedPref.getStringSet("modules", Collections.<String>emptySet());
 
@@ -228,12 +228,11 @@ public class TimetableGeneration {
         for (String modCode : modSet) {
             mods.add(SampleModules.getModuleByCode(semester, modCode, context));
         }
-        sharedPref.edit().remove("modules").apply();
         return mods;
     }
 
     public static void test(Context context) {
-        List<Module> mods = getAndClearModules(context);
+        List<Module> mods = getModules(context);
         Log.v("TimetableGeneration", mods.toString());
         if (mods.size() == 0) return;
         TimetableGeneration t = new TimetableGeneration();

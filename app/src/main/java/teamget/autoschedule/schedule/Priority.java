@@ -1,5 +1,7 @@
 package teamget.autoschedule.schedule;
 
+import android.content.res.Resources;
+
 public abstract class Priority {
     static int priorityCount = 0;
     public int rank;
@@ -20,4 +22,6 @@ public abstract class Priority {
         double score = getScoreMultiplier(t) * max;
         return score;
     }
+
+    public abstract String toString(Resources r);
 }

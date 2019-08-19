@@ -1,5 +1,9 @@
 package teamget.autoschedule.schedule;
 
+import android.content.res.Resources;
+
+import teamget.autoschedule.R;
+
 public class LunchBreakPriority extends Priority {
     public int hours;
 
@@ -26,5 +30,10 @@ public class LunchBreakPriority extends Priority {
             if (!isFree) { multiplier = multiplier - 0.2; }
         }
         return multiplier;
+    }
+
+    @Override
+    public String toString(Resources r) {
+        return r.getString(R.string.priority_lunch_break_description, hours);
     }
 }

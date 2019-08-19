@@ -41,6 +41,18 @@
         app:layout_constraintBottom_toBottomOf="@+id/include"
         app:layout_constraintTop_toBottomOf="@+id/appBarLayout5" />
 
+    <TextView
+        android:id="@+id/emptyTimetableText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:gravity="center"
+        android:text="@string/chosen_timetable_empty_timetable"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        app:layout_constraintBottom_toBottomOf="@+id/include"
+        app:layout_constraintTop_toTopOf="@+id/chosenTimetableGrid" />
+
     <include
         android:id="@+id/include"
         layout="@layout/content_priority_input" />

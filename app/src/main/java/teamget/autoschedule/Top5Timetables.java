@@ -33,7 +33,7 @@ public class Top5Timetables extends AppCompatActivity {
     private RecyclerView.Adapter adapter;
     private RecyclerView.LayoutManager layoutManager;
 
-    List<Timetable> timetables;
+    private List<Timetable> timetables;
 
 //    SharedPreferences timetablePref;
 //    SharedPreferences.Editor spEditor;
@@ -46,17 +46,17 @@ public class Top5Timetables extends AppCompatActivity {
 //        spEditor = timetablePref.edit();
 
         // Receive SP for modules and priorities
-        SharedPreferences modulePrefs = getSharedPreferences("ModulePreferences", MODE_PRIVATE);
-        int semester = modulePrefs.getInt("semester", 0);
-        Set<String> moduleSet = modulePrefs.getStringSet("modules", Collections.emptySet());
+        SharedPreferences preferences = TimetablePreferences.getInstance()
+                .getPreferences(this);
+        int semester = preferences.getInt("semester", 0);
+        Set<String> moduleSet = preferences.getStringSet("modules", Collections.emptySet());
         List<String> moduleCodes = new ArrayList<>(moduleSet);
         List<Module> modules = new ArrayList<>();
         for (String s : moduleCodes) {
             modules.add(SampleModules.getModuleByCode(semester, s, getApplicationContext()));
         }
 
-        SharedPreferences priorityPrefs = getSharedPreferences("PriorityPreferences", MODE_PRIVATE);
-        Set<String> prioritySet = priorityPrefs.getStringSet("priorities", Collections.emptySet());
+        Set<String> prioritySet = preferences.getStringSet("priorities", Collections.emptySet());
         List<String> moduleJson = new ArrayList<>(prioritySet);
         List<Priority> priorities = new ArrayList<>();
 
@@ -137,11 +137,11 @@ public class Top5Timetables extends AppCompatActivity {
 
     public void onButtonClick(int position) {
         final Gson gson = new Gson();
-        getSharedPreferences("ChosenTimetable", MODE_PRIVATE)
-                .edit()
+        TimetablePreferences.getInstance().getPreferences(this).edit()
                 .putString("timetable", gson.toJson(timetables.get(position)))
                 .apply();
         Intent intent = new Intent(this, ChosenTimetable.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
     }
 }

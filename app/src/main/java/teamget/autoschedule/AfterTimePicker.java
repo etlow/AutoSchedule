@@ -42,8 +42,6 @@ public class AfterTimePicker extends DialogFragment implements TimePickerDialog.
     }
 
     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-        TextView text = (TextView) getActivity().findViewById(R.id.text_to_fill);
-        text.setText(String.format("Avoid lessons after %d:%02d.", hourOfDay, minute));
-        lf.addItem((String) text.getText().toString(), new AvoidLessonsAfterPriority(0, hourOfDay));
+        lf.addItem(new AvoidLessonsAfterPriority(0, hourOfDay * 60 + minute));
     }
 }

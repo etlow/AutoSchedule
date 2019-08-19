@@ -37,4 +37,26 @@
     <string name="async_error">Could not download events from the internet</string>
     <string name="appwidget_text">EXAMPLE</string>
     <string name="add_widget">Add widget</string>
+    <string name="chosen_timetable_empty_timetable">Add events using the menu at the top right.</string>
+    <string name="chosen_timetable_menu_delete_account">Delete account and all data</string>
+    <string name="chosen_timetable_menu_delete_data">Delete all data</string>
+    <string name="chosen_timetable_delete_account_fail">Could not delete account: %s</string>
+    <string name="chosen_timetable_menu_log_in_out">Log in / out</string>
+    <string name="chosen_timetable_menu_log_in">Log in</string>
+    <string name="chosen_timetable_menu_log_out">Log out</string>
+    <string name="chosen_timetable_menu_modules_add">Add modules</string>
+    <string name="chosen_timetable_menu_modules_edit">Edit modules</string>
+    <string name="priority_avoid_before_description">Avoid lessons before %d:%02d.</string>
+    <string name="priority_avoid_after_description">Avoid lessons after %d:%02d.</string>
+    <string name="priority_max_free_description">I want as many free days as possible.</string>
+    <string name="priority_min_travelling_description">I want minimal travelling across the \ncampus.</string>
+    <string name="priority_min_breaks_description">I want minimal breaks between classes.</string>
+    <string name="priority_free_period_daily_description">I want to be free every day from %d:%02d \nto %d:%02d.</string>
+    <string name="priority_free_period_day_description">I want to be free on %s from %d:%02d to \n%d:%02d.</string>
+    <string name="priority_lunch_break_description">I want a lunch break of at least %d hours.</string>
+    <string name="default_timetable">Default</string>
+    <string name="sign_in_cancelled">Sign in cancelled</string>
+    <string name="no_internet_connection">No internet connection</string>
+    <string name="unknown_error">Unknown error</string>
+    <string name="data_error">Could not get data</string>
 </resources>

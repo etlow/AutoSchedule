@@ -2,12 +2,15 @@ package teamget.autoschedule;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import java.util.Arrays;
 
 import teamget.autoschedule.mods.SampleModules;
 
@@ -21,15 +24,24 @@ public class SemesterSelection extends AppCompatActivity implements AdapterView.
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_semester_selection);
 
-        pref = getApplicationContext().getSharedPreferences("ModulePreferences", MODE_PRIVATE);
+        pref = TimetablePreferences.getInstance().getPreferences(this);
         editor = pref.edit();
 
         year = findViewById(R.id.yearspinner);
         String[] years = new String[]{"2018-2019", "2019-2020"};
+
+        int yearPos = 0;
+        String currYear = pref.getString("year", null);
+        if (currYear != null) yearPos = Arrays.asList(years).indexOf(currYear);
+        if (yearPos == -1) yearPos = 0;
+
+        int semPos = pref.getInt("semester", 1) - 1;
+
         ArrayAdapter<String> yearAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, years);
         yearAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         year.setAdapter(yearAdapter);
         year.setOnItemSelectedListener(this);
+        year.setSelection(yearPos);
 
         semester = findViewById(R.id.semesterspinner);
         String[] semesters = new String[]{"Semester 1", "Semester 2", "Special Term I", "Special Term II"};
@@ -37,6 +49,7 @@ public class SemesterSelection extends AppCompatActivity implements AdapterView.
         semesterAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         semester.setAdapter(semesterAdapter);
         semester.setOnItemSelectedListener(this);
+        semester.setSelection(semPos);
     }
 
     @Override

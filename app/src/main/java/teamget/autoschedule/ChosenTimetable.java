@@ -9,30 +9,24 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.gridlayout.widget.GridLayout;
 
-import com.firebase.ui.auth.AuthUI;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.gson.Gson;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.Locale;
 
 import teamget.autoschedule.schedule.Timetable;
 
 public class ChosenTimetable extends AppCompatActivity {
-    private static final String TAG = "ChosenTimetable";
-    private static final int RC_SIGN_IN = 123;
+    private TimetablePreferences timetablePreferences = TimetablePreferences.getInstance();
+    private AuthFragment authFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,7 +35,8 @@ public class ChosenTimetable extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        storeData();
+        authFragment = AuthFragment.getInstance(getSupportFragmentManager());
+        timetablePreferences.uploadData(this);
 
         // To make app subsequently launch into this activity by default
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
@@ -49,12 +44,16 @@ public class ChosenTimetable extends AppCompatActivity {
         edit.putBoolean(getString(R.string.is_setup), Boolean.TRUE);
         edit.apply();
 
-        SharedPreferences pref = getSharedPreferences("ChosenTimetable", MODE_PRIVATE);
+        SharedPreferences pref = timetablePreferences.getPreferences(this);
         String timetableStr = pref.getString("timetable", null);
-        Gson gson = new Gson();
-        Timetable timetable = gson.fromJson(timetableStr, Timetable.class);
-        GridLayout gridLayout = findViewById(R.id.chosenTimetableGrid);
-        new TimetableFiller(gridLayout, TimetableFiller.VERTICAL).fill(timetable);
+        if (timetableStr != null) {
+            findViewById(R.id.emptyTimetableText).setVisibility(View.GONE);
+            Gson gson = new Gson();
+            Timetable timetable = gson.fromJson(timetableStr, Timetable.class);
+            GridLayout gridLayout = findViewById(R.id.chosenTimetableGrid);
+            new TimetableFiller(gridLayout, TimetableFiller.VERTICAL).fill(timetable);
+            Log.v("ChosenTimetable", timetablePreferences.getCurr(this));
+        }
 
         AppWidgetManager awm = AppWidgetManager.getInstance(this);
         int[] ids = awm.getAppWidgetIds(new ComponentName(this, ChosenTimetableWidget.class));
@@ -63,28 +62,46 @@ public class ChosenTimetable extends AppCompatActivity {
         sendBroadcast(updateIntent);
     }
 
-    private void updateLogInOut(Menu menu, FirebaseAuth firebaseAuth) {
-        String text;
+    private void updateMenuText(Menu menu, FirebaseAuth firebaseAuth) {
+        int text;
+        int deleteText;
         FirebaseUser user = firebaseAuth.getCurrentUser();
         if (user != null && !user.isAnonymous()) {
             // already signed in
-            text = "Log out";
+            text = R.string.chosen_timetable_menu_log_out;
+            deleteText = R.string.chosen_timetable_menu_delete_account;
         } else {
             // not signed in or anonymous
-            text = "Log in";
+            text = R.string.chosen_timetable_menu_log_in;
+            deleteText = R.string.chosen_timetable_menu_delete_data;
         }
         menu.findItem(R.id.action_log_in_out).setTitle(text);
+        menu.findItem(R.id.action_delete_account).setTitle(deleteText);
+
+        int moduleText;
+        boolean visible;
+        SharedPreferences pref = timetablePreferences.getPreferences(this);
+        if (pref.getStringSet("modules", null) == null) {
+            moduleText = R.string.chosen_timetable_menu_modules_add;
+            visible = false;
+        } else {
+            moduleText = R.string.chosen_timetable_menu_modules_edit;
+            visible = true;
+        }
+        menu.findItem(R.id.action_edit_modules).setTitle(moduleText);
+        menu.findItem(R.id.action_edit_priorities).setVisible(visible);
+        menu.findItem(R.id.action_choose_other_timetable).setVisible(visible);
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.chosen_timetable_action_bar, menu);
-        FirebaseAuth.getInstance().addAuthStateListener(auth -> updateLogInOut(menu, auth));
+        FirebaseAuth.getInstance().addAuthStateListener(auth -> updateMenuText(menu, auth));
         return true;
     }
 
     @Override
     public boolean onMenuOpened(int featureId, Menu menu) {
-        updateLogInOut(menu, FirebaseAuth.getInstance());
+        updateMenuText(menu, FirebaseAuth.getInstance());
         return super.onMenuOpened(featureId, menu);
     }
 
@@ -96,7 +113,7 @@ public class ChosenTimetable extends AppCompatActivity {
                 return true;
 
             case R.id.action_edit_modules:
-                Intent intent = new Intent(this, ModuleInput.class);
+                Intent intent = new Intent(this, SemesterSelection.class);
                 startActivity(intent);
                 return true;
 
@@ -111,92 +128,39 @@ public class ChosenTimetable extends AppCompatActivity {
                 return true;
 
             case R.id.action_log_in_out:
-                if (item.getTitle().length() == 7) {
-                    signOut();
+                if (item.getTitle().equals(getString(R.string.chosen_timetable_menu_log_out))) {
+                    authFragment.signOut(this).addOnCompleteListener(task -> {
+                        // user is now signed out
+                        Intent in = new Intent(this, MainActivity.class);
+                        in.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        startActivity(in);
+                        finish();
+                    });
                 } else {
-                    startSignIn();
+                    authFragment.startSignIn(() -> {
+                        Intent in = new Intent(this, ChosenTimetable.class);
+                        startActivity(in);
+                    }, id -> Snackbar.make(findViewById(R.id.textView3), id, Snackbar.LENGTH_LONG));
                 }
+                return true;
+
+            case R.id.action_delete_account:
+                authFragment.deleteAccount(this).addOnSuccessListener(aVoid -> {
+                    Intent in = new Intent(this, MainActivity.class);
+                    in.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(in);
+                }).addOnFailureListener(exception -> {
+                    String message = String.format(Locale.getDefault(),
+                            getString(R.string.chosen_timetable_delete_account_fail),
+                            exception.getMessage());
+                    Snackbar.make(findViewById(R.id.chosenTimetableGrid), message,
+                            Snackbar.LENGTH_LONG);
+                });
                 return true;
 
             default:
                 return super.onOptionsItemSelected(item);
 
         }
-    }
-
-    private void startSignIn() {
-        FirebaseAuth auth = FirebaseAuth.getInstance();
-        FirebaseUser user = auth.getCurrentUser();
-        if (user == null || user.isAnonymous()) {
-            // not signed in
-            List<AuthUI.IdpConfig> providers = Arrays.asList(
-                    new AuthUI.IdpConfig.EmailBuilder().build(),
-                    new AuthUI.IdpConfig.PhoneBuilder().build(),
-                    new AuthUI.IdpConfig.GoogleBuilder().build(),
-                    // new AuthUI.IdpConfig.FacebookBuilder().build(),
-                    // new AuthUI.IdpConfig.TwitterBuilder().build(),
-                    new AuthUI.IdpConfig.AnonymousBuilder().build());
-
-            // Create and launch sign-in intent
-            startActivityForResult(
-                    AuthUI.getInstance()
-                            .createSignInIntentBuilder()
-                            .enableAnonymousUsersAutoUpgrade()
-                            .setAvailableProviders(providers)
-                            .setLogo(R.drawable.autoschedule_logo)
-                            .build(),
-                    RC_SIGN_IN);
-        }
-    }
-
-    private void signOut() {
-        AuthUI.getInstance()
-                .signOut(this)
-                .addOnCompleteListener(task -> {
-                    // user is now signed out
-                    PreferenceManager.getDefaultSharedPreferences(getBaseContext())
-                            .edit().clear().apply();
-                    getSharedPreferences("ModulePreferences", MODE_PRIVATE)
-                            .edit().clear().apply();
-                    getSharedPreferences("PriorityPreferences", MODE_PRIVATE)
-                            .edit().clear().apply();
-                    Intent intent = new Intent(this, MainActivity.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    startActivity(intent);
-                    finish();
-                });
-    }
-
-    private void storeData() {
-        SharedPreferences modulePrefs = getSharedPreferences("ModulePreferences", MODE_PRIVATE);
-        Map<String, ?> map = modulePrefs.getAll();
-        Map<String, Object> newMap = new HashMap<>(map);
-        Set modules = (Set) newMap.get("modules");
-        if (modules != null) newMap.put("modules", new ArrayList<Object>(modules));
-
-        FirebaseAuth auth = FirebaseAuth.getInstance();
-        String uid = auth.getUid();
-        if (uid == null) return;
-
-        // Access a Cloud Firestore instance from your Activity
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        CollectionReference coll =  db.collection("users").document(uid)
-                .collection("data");
-        coll.document("ModulePreferences")
-                .set(newMap)
-                .addOnSuccessListener(aVoid ->
-                        Log.d(TAG, "DocumentSnapshot successfully written!"))
-                .addOnFailureListener(e -> Log.w(TAG, "Error writing document", e));
-
-        String timetable = getSharedPreferences("ChosenTimetable", MODE_PRIVATE)
-                .getString("timetable", null);
-        assert timetable != null;
-        Map<String, String> chosen = new HashMap<>();
-        chosen.put("timetable", timetable);
-        coll.document("ChosenTimetable")
-                .set(chosen)
-                .addOnSuccessListener(aVoid ->
-                        Log.d(TAG, "DocumentSnapshot successfully written!"))
-                .addOnFailureListener(e -> Log.w(TAG, "Error writing document", e));
     }
 }

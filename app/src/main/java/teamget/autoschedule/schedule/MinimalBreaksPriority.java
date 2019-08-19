@@ -1,5 +1,9 @@
 package teamget.autoschedule.schedule;
 
+import android.content.res.Resources;
+
+import teamget.autoschedule.R;
+
 public class MinimalBreaksPriority extends Priority {
     static int minHoursOfBreaks;
     static int maxHoursOfBreaks;
@@ -43,5 +47,10 @@ public class MinimalBreaksPriority extends Priority {
         if (maxHoursOfBreaks == minHoursOfBreaks) { return 1; }
         double multiplier = (maxHoursOfBreaks - hoursOfBreaks) / (maxHoursOfBreaks - minHoursOfBreaks);
         return multiplier;
+    }
+
+    @Override
+    public String toString(Resources r) {
+        return r.getString(R.string.priority_min_breaks_description);
     }
 }

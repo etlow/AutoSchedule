@@ -1,5 +1,8 @@
 package teamget.autoschedule.schedule;
 
+import android.content.res.Resources;
+
+import teamget.autoschedule.R;
 import teamget.autoschedule.mods.Location;
 import teamget.autoschedule.mods.Option;
 
@@ -65,5 +68,10 @@ public class MinimalTravellingPriority extends Priority {
         if (maxPossibleDist - minPossibleDist < 1) return 1;
         double multiplier = (maxPossibleDist - findDistance(t)) / (maxPossibleDist - minPossibleDist);
         return multiplier;
+    }
+
+    @Override
+    public String toString(Resources r) {
+        return r.getString(R.string.priority_min_travelling_description);
     }
 }
