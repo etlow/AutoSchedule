@@ -92,9 +92,8 @@ public class PriorityInput extends AppCompatActivity implements NumberPicker.OnV
         maxFreeDays.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                TextView text = (TextView) findViewById(R.id.text_to_fill);
-                text.setText("I want as many free days as possible.");
-                lf.addItem((String) text.getText().toString(), new MaxFreeDaysPriority(0));
+                String text = "I want as many free days as possible.";
+                lf.addItem(text, new MaxFreeDaysPriority(0));
             }
         });
 
@@ -110,18 +109,16 @@ public class PriorityInput extends AppCompatActivity implements NumberPicker.OnV
         minTravelling.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                TextView text = (TextView) findViewById(R.id.text_to_fill);
-                text.setText("I want minimal travelling across the \ncampus.");
-                lf.addItem((String) text.getText().toString(), new MinimalTravellingPriority(0));
+                String text = "I want minimal travelling across the \ncampus.";
+                lf.addItem(text, new MinimalTravellingPriority(0));
             }
         });
 
         minBreaks.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                TextView text = (TextView) findViewById(R.id.text_to_fill);
-                text.setText("I want minimal breaks between classes.");
-                lf.addItem((String) text.getText().toString(), new MinimalBreaksPriority(0));
+                String text = "I want minimal breaks between classes.";
+                lf.addItem(text, new MinimalBreaksPriority(0));
             }
         });
 

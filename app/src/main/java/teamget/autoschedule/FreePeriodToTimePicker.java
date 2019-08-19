@@ -56,15 +56,15 @@ public class FreePeriodToTimePicker extends DialogFragment implements TimePicker
     }
 
     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-        TextView text = (TextView) getActivity().findViewById(R.id.text_to_fill);
+        String text;
         int dayID = day.equals("Every day") ? 5 : DayOfWeek.valueOf(day.toUpperCase()).ordinal();
         if (dayID == 5) {
-            text.setText(String.format("I want to be free every day from %d:%02d \nto %d:%02d.",
-                    fromTimeHour, fromTimeMinute, hourOfDay, minute));
+            text = String.format("I want to be free every day from %d:%02d \nto %d:%02d.",
+                    fromTimeHour, fromTimeMinute, hourOfDay, minute);
         } else {
-            text.setText(String.format("I want to be free on %s from %d:%02d to \n%d:%02d.",
-                    day.substring(0, 3), fromTimeHour, fromTimeMinute, hourOfDay, minute));
+            text = String.format("I want to be free on %s from %d:%02d to \n%d:%02d.",
+                    day.substring(0, 3), fromTimeHour, fromTimeMinute, hourOfDay, minute);
         }
-        lf.addItem((String) text.getText().toString(), new FreePeriodPriority(0, dayID, fromTimeHour, hourOfDay));
+        lf.addItem(text, new FreePeriodPriority(0, dayID, fromTimeHour, hourOfDay));
     }
 }
