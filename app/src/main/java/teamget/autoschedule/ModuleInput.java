@@ -35,6 +35,7 @@ public class ModuleInput extends AppCompatActivity implements SearchView.OnQuery
     SearchView searchView;
     ArrayAdapter<String> adapter;
     ArrayList<String> moduleCodes;
+    Set<String> currModules;
     SharedPreferences modulePref;
     SharedPreferences.Editor spEditor;
     ModuleAdapter moduleAdapter;
@@ -50,6 +51,7 @@ public class ModuleInput extends AppCompatActivity implements SearchView.OnQuery
         moduleAdapter = new ModuleAdapter();
 
         modulePref = getApplicationContext().getSharedPreferences("ModulePreferences", MODE_PRIVATE);
+        currModules = new HashSet<>(modulePref.getStringSet("modules", Collections.emptySet()));
         spEditor = modulePref.edit();
 
         searchView = (SearchView) findViewById(R.id.module_searchview);
@@ -75,12 +77,8 @@ public class ModuleInput extends AppCompatActivity implements SearchView.OnQuery
 
                 SampleModules.download(modCode, getApplicationContext());
 
-                Set<String> curr = modulePref.getStringSet("modules", Collections.<String>emptySet());
-                HashSet<String> newSet = new HashSet<>(curr);
-                newSet.add(modCode);
-
-                spEditor.putStringSet("modules", newSet);
-                spEditor.commit();
+                currModules.add(modCode);
+                spEditor.putStringSet("modules", currModules).apply();
 
                 Snackbar.make(findViewById(android.R.id.content),
                         parent.getItemAtPosition(position).toString() + " added!",
@@ -114,6 +112,8 @@ public class ModuleInput extends AppCompatActivity implements SearchView.OnQuery
             public void onClick(View v) {
                 chipGroup.removeView(chip);
 
+                currModules.remove(chip.getText().toString());
+                spEditor.putStringSet("modules", currModules).apply();
             }
         });
         return chip;
