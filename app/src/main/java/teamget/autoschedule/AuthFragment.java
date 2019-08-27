@@ -51,9 +51,9 @@ class AuthFragment extends Fragment {
     void checkSignInAndContinue(Runnable onSuccess, Consumer<Integer> failSnack) {
         if (auth.getCurrentUser() != null) {
             // already signed in, exited before making timetable
-            timetablePref.downloadData(getContext())
+            runAfterAdded(() -> timetablePref.downloadData(getContext())
                     .addOnSuccessListener(snapshots -> onSuccess.run())
-                    .addOnFailureListener(e -> showSnack.accept(R.string.data_error));
+                    .addOnFailureListener(e -> failSnack.accept(R.string.data_error)));
         } else {
             // not signed in
             startSignIn(onSuccess, failSnack);
