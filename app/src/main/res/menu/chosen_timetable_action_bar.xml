@@ -2,11 +2,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/action_add_events"
-        android:icon="@drawable/ic_plus_24px"
-        android:title="Add event"
-        app:showAsAction="always"/>
-    <item
         android:id="@+id/empty"
         android:title="Edit more..."
         android:orderInCategory="101"

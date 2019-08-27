@@ -108,10 +108,6 @@ public class ChosenTimetable extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.action_add_events:
-                // Add ad-hoc events
-                return true;
-
             case R.id.action_edit_modules:
                 Intent intent = new Intent(this, SemesterSelection.class);
                 startActivity(intent);
