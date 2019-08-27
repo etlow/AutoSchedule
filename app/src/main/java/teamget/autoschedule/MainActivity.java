@@ -1,6 +1,7 @@
 package teamget.autoschedule;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 
@@ -19,7 +20,13 @@ public class MainActivity extends AppCompatActivity {
 
     public void onButtonClick(View v) {
         AuthFragment.getInstance(getSupportFragmentManager()).checkSignInAndContinue(() -> {
-            Intent intent = new Intent(this, ChosenTimetable.class);
+            SharedPreferences pref = TimetablePreferences.getInstance().getPreferences(this);
+            Intent intent;
+            if (pref.getString("timetable", null) == null) {
+                intent = new Intent(this, SemesterSelection.class);
+            } else {
+                intent = new Intent(this, ChosenTimetable.class);
+            }
             startActivity(intent);
         }, id -> Snackbar.make(findViewById(R.id.textView3), id, Snackbar.LENGTH_LONG));
     }
