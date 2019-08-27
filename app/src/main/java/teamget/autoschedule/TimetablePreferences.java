@@ -164,6 +164,16 @@ public class TimetablePreferences {
                         for (Object name : (List) timetableSet) addNameSet.add((String) name);
                         renameTimetables(context, addNameSet);
                     }
+
+                    if (getCurr(context) == null) {
+                        Object currName = map.get(prefCurrName);
+                        if (currName instanceof String) {
+                            setCurr(context, (String) currName);
+                        } else {
+                            Log.w(TAG, "Current timetable is null and store is " + currName);
+                            setCurr(context, context.getString(R.string.default_timetable));
+                        }
+                    }
                 }
 
                 QuerySnapshot snapshot = task.getResult();
